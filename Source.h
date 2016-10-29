@@ -6,7 +6,11 @@
 #define TKOM_SOURCE_H
 
 
-class Source {
+class Source
+{
+
+    char nextChar();
+
 
 };
 

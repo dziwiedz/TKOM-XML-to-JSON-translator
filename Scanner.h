@@ -6,7 +6,16 @@
 #define TKOM_SCANNER_H
 
 
-class Scanner {
+#include "Source.h"
+
+class Scanner
+{
+    Source& src;
+    char c;
+
+    void nextc();
+
+
 
 };
 

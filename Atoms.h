@@ -15,4 +15,17 @@ enum ScanErrors
 
 };
 
+enum Atoms
+{
+    COMMENT_TAG,
+    TEXT,
+    START_TAG_BODY,
+    END_TAG_BODY,
+    EMPTY_TAG_SLASH,
+    ATRIBBUTE,
+    
+
+
+};
+
 #endif //TKOM_ATOMS_H
