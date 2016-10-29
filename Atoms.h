@@ -18,12 +18,20 @@ enum ScanErrors
 enum Atoms
 {
     COMMENT_TAG,
-    TEXT,
+    S_TEXT,
+
     START_TAG_BODY,
     END_TAG_BODY,
     EMPTY_TAG_SLASH,
+
     ATRIBBUTE,
-    
+
+    EQUAL_TAG,
+    NAME_TAG,
+
+    END_OF_FILE
+
+
 
 
 };
