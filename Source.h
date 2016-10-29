@@ -5,25 +5,28 @@
 #ifndef TKOM_SOURCE_H
 #define TKOM_SOURCE_H
 #include <fstream>
-#include <queue>
 using namespace std;
+
+/**
+ * Klasa reprezentujaca plik zrodlowy.
+ * Udostepnia funkcje pobierania nastepnych znakow, cofniecia pozycji oraz pobranie aktualnej pozycji w pliku.
+ */
 class Source
 {
 
     FILE* inputFile;
 
-    queue<char> fifoSymbolContainer; // @TODO do poprawienia nazwa
-
 
 
     unsigned int column_number;
     unsigned int line_number;
-    void feedContainer();
+
 public:
     Source(string fileName);
     virtual ~Source();
 
     char getNextChar();
+    void ungetChar(char c);
 
     unsigned int getColumn_number() const;
 

@@ -7,7 +7,10 @@
 
 
 #include "Source.h"
-
+#include "Token.h"
+/**
+ * Skaner.
+ */
 class Scanner
 {
     Source& src;
@@ -15,7 +18,14 @@ class Scanner
 
     void nextc();
 
+public:
+    Scanner(Source &s);
 
+    virtual ~Scanner();
+
+    bool isWhiteSpace(char s);
+
+    Token nextToken();
 
 };
 

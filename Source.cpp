@@ -29,18 +29,14 @@ Source::~Source()
         fclose(inputFile);
     }
 }
-
-void Source::feedContainer()
-{
-    char c = getc(inputFile);
-    ++line_number;
-    
-}
-
+/**
+ * Pobieranie nastepnego znaku z pliku zrodlowego
+ * @return Akutalny znak pliku zrodlowego
+ */
 char Source::getNextChar()
 {
 
-    /*
+
     char c = getc(inputFile);
     ++column_number;
 
@@ -50,7 +46,15 @@ char Source::getNextChar()
         column_number=0;
     }
     return c;
-     */
+}
+
+/**
+ * Cofniecie pozycji w pliku zrodlowym.
+ * @param c Aktualny znak
+ */
+void Source::ungetChar(char c)
+{
+    ungetc(c, inputFile);
 }
 
 
