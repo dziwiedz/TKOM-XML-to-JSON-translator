@@ -29,6 +29,11 @@ Source::~Source()
         fclose(inputFile);
     }
 }
+
+void Source::feedContainer()
+{
+    charContainer.push(getc(inputFile));
+}
 /**
  * Pobieranie nastepnego znaku z pliku zrodlowego
  * @return Akutalny znak pliku zrodlowego
@@ -36,18 +41,20 @@ Source::~Source()
 char Source::getNextChar()
 {
 
-
-    char c = getc(inputFile);
-    ++column_number;
-
-    if (c=='\n');
-    {
-        ++line_number;
-        column_number=0;
-    }
+    if (charContainer.empty()) feedContainer();
+    char c = charContainer.front();
+    charContainer.pop();
     return c;
 }
-
+/**
+ *
+ * @return
+ */
+char Source::checkChar()
+{
+    feedContainer();
+    return charContainer.back();
+}
 /**
  * Cofniecie pozycji w pliku zrodlowym.
  * @param c Aktualny znak

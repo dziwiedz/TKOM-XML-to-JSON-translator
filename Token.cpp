@@ -5,6 +5,10 @@
 #include "Token.h"
 
 Token::Token() {}
+Token::Token(Atoms a, std::string s, int l, int c) : tokenType(a), tokenField(s), line(l), column(c)
+{
+
+}
 
 Token::~Token() {
 

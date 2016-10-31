@@ -17,17 +17,19 @@ enum ScanErrors
 
 enum Atoms
 {
-    COMMENT_TAG,
-    S_TEXT,
+    COMMENT_TAG, // <!-- COMMENT -->
+    PROLOG_TAG, // <?xml version="1.0" encoding="UTF-8"?>
+    SIMPLE_TEXT,
+    CDATA_TAG, // <![CDATA[ ... ]]>
 
-    START_TAG_BODY,
-    END_TAG_BODY,
-    EMPTY_TAG_SLASH,
+    START_TAG, // '<'
+    END_TAG, // '/>'
+    EMPTY_TAG, // '/>'
 
-    ATRIBBUTE,
+    ATRIBBUTE, // <note ATTRIBUTE='12'> </note>
 
-    EQUAL_TAG,
-    NAME_TAG,
+    EQUAL_TAG, // '='
+    PARAGRAPH_NAME, //
 
     END_OF_FILE
 
