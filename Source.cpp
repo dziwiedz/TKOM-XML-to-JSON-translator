@@ -9,7 +9,7 @@ Source::Source(string fileName)
 {
     inputFile = fopen(fileName.c_str(),"r");
 
-    if (!inputFile)
+    if (inputFile)
     {
         column_number = 0;
         line_number = 1;
@@ -17,7 +17,7 @@ Source::Source(string fileName)
     }
     else
     {
-        cerr << "Cannot read file " << fileName << endl;
+        cout<< "Cannot read file " << fileName << endl;
     }
 
 }
@@ -32,7 +32,8 @@ Source::~Source()
 
 void Source::feedContainer()
 {
-    charContainer.push(getc(inputFile));
+    char s = getc(inputFile);
+    charContainer.push(s);
 }
 /**
  * Pobieranie nastepnego znaku z pliku zrodlowego
@@ -43,6 +44,14 @@ char Source::getNextChar()
 
     if (charContainer.empty()) feedContainer();
     char c = charContainer.front();
+    if (c == '\t') column_number+=4;
+    else column_number++;
+    if (c == '\n')
+    {
+        column_number =0;
+        line_number++;
+    }
+
     charContainer.pop();
     return c;
 }
@@ -52,8 +61,8 @@ char Source::getNextChar()
  */
 char Source::checkChar()
 {
-    feedContainer();
-    return charContainer.back();
+    if (charContainer.empty()) feedContainer();
+    return charContainer.front();
 }
 /**
  * Cofniecie pozycji w pliku zrodlowym.

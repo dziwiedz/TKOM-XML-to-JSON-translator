@@ -18,10 +18,12 @@ class Scanner
     unsigned int scanErrors;
 
     void nextc();
+    void skipChar(int number);
     char getCharAfterCurrent();
     Token processAtributte();
+    bool checkCDATASpelling();
 
-    bool isCorrectTextChar();
+    bool isCorrectTextChar(char s);
     bool isWhitespace(char s);
 
     void scanError(string errorMessage);

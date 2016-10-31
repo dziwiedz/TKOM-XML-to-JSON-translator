@@ -25,3 +25,7 @@ int Token::getLine() const {
 int Token::getColumn() const {
     return column;
 }
+
+const string &Token::getTokenField() const {
+    return tokenField;
+}

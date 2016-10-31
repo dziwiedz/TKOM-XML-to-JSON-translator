@@ -7,15 +7,15 @@
 
 #include "Atoms.h"
 #include <string>
-
+using namespace std;
 class Token {
     Atoms tokenType;
     std::string tokenField;
     int line;
     int column;
-
-
 public:
+    const string &getTokenField() const;
+
     Token();
     Token(Atoms a, std::string s, int l, int c);
     virtual ~Token();
