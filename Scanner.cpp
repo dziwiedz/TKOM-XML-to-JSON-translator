@@ -21,23 +21,9 @@ void Scanner::nextc() {
     c = src.getNextChar();
 }
 
-char Scanner::getCharAfterCurrent() {
-    return src.checkChar();
-}
-
-
 void Scanner::scanError(string errorMessage) {
     cout << "Lexer error (" << src.getLine_number() << "," << src.getColumn_number() << "). " << errorMessage << endl;
     scanErrors++;
-}
-
-bool Scanner::isWhitespace(char s) {
-    if (s == ' ' || s=='\n' || s =='\t') return true;
-    else return false;
-}
-
-bool Scanner::isCorrectTextChar(char s) {
-    return (isalpha(s) || s == '_' || s == '-' || isdigit(s) || s == ' ');
 }
 
 void Scanner::skipChar(int number)
@@ -47,6 +33,30 @@ void Scanner::skipChar(int number)
         nextc();
     }
 }
+
+char Scanner::getCharAfterCurrent() {
+    return src.checkChar();
+}
+
+bool Scanner::checkCDATASpelling() {
+    string cdata = "CDATA[";
+    for (int i=0;i <6;++i)
+    {
+        nextc();
+        if (c==EOF || c!=cdata[i]) return false;
+    }
+    return true;
+}
+
+bool Scanner::isCorrectTextChar(char s) {
+    return (isalpha(s) || s == '_' || s == '-' || isdigit(s) || s =='\'');
+}
+
+bool Scanner::isWhitespace(char s) {
+    return (s == ' ' || s=='\n' || s =='\t');
+}
+
+
 
 Token Scanner::nextToken() {
     string text = "";
@@ -178,14 +188,4 @@ Token Scanner::processAtributte() {
     if (c!=endQuote) scanError("Atributtes must be closed by the same quote ");
 
     return Token(ATRIBBUTE, s, src.getLine_number(), src.getColumn_number());
-}
-
-bool Scanner::checkCDATASpelling() {
-    string cdata = "CDATA[";
-    for (int i=0;i <6;++i)
-    {
-        nextc();
-        if (c==EOF || c!=cdata[i]) return false;
-    }
-    return true;
 }

@@ -26,17 +26,20 @@ class Source
 
     FILE* inputFile;
     queue<char> charContainer;
-    void feedContainer();
     unsigned int column_number;
     unsigned int line_number;
 
+    void feedContainer();
+
+
 public:
     Source(string fileName);
+
     virtual ~Source();
 
     char getNextChar();
+
     char checkChar();
-    void ungetChar(char c);
 
     unsigned int getColumn_number() const;
 

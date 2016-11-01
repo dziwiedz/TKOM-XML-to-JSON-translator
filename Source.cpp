@@ -44,14 +44,25 @@ char Source::getNextChar()
 
     if (charContainer.empty()) feedContainer();
     char c = charContainer.front();
-    if (c == '\t') column_number+=4;
-    else column_number++;
-    if (c == '\n')
+    switch (c)
     {
-        column_number =0;
-        line_number++;
+        case '\t':
+        {
+            column_number+=8;
+            break;
+        }
+        case '\n':
+        {
+            column_number=0;
+            ++line_number;
+            break;
+        }
+        default:
+        {
+            ++column_number;
+            break;
+        }
     }
-
     charContainer.pop();
     return c;
 }
@@ -63,14 +74,6 @@ char Source::checkChar()
 {
     if (charContainer.empty()) feedContainer();
     return charContainer.front();
-}
-/**
- * Cofniecie pozycji w pliku zrodlowym.
- * @param c Aktualny znak
- */
-void Source::ungetChar(char c)
-{
-    ungetc(c, inputFile);
 }
 
 

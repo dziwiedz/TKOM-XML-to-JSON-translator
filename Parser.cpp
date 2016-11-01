@@ -3,3 +3,9 @@
 //
 
 #include "Parser.h"
+
+Parser::Parser(Scanner &scn) : scn(s) {}
+
+Parser::~Parser() {
+
+}

@@ -14,19 +14,27 @@
 class Scanner
 {
     Source& src;
+
     char c;
+
     unsigned int scanErrors;
 
     void nextc();
+
     void skipChar(int number);
+
+    void scanError(string errorMessage);
+
     char getCharAfterCurrent();
-    Token processAtributte();
+
     bool checkCDATASpelling();
 
     bool isCorrectTextChar(char s);
+
     bool isWhitespace(char s);
 
-    void scanError(string errorMessage);
+    Token processAtributte();
+
 
 public:
     Scanner(Source &s);
