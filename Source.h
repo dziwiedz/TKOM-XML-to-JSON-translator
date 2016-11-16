@@ -5,7 +5,6 @@
 #ifndef TKOM_SOURCE_H
 #define TKOM_SOURCE_H
 #include <fstream>
-#include <queue>
 using namespace std;
 
 /**
@@ -25,11 +24,9 @@ class Source
 {
 
     FILE* inputFile;
-    queue<char> charContainer;
     unsigned int column_number;
     unsigned int line_number;
 
-    void feedContainer();
 
 
 public:
@@ -38,8 +35,6 @@ public:
     virtual ~Source();
 
     char getNextChar();
-
-    char checkChar();
 
     unsigned int getColumn_number() const;
 

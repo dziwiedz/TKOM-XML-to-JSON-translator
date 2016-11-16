@@ -30,27 +30,15 @@ Source::~Source()
     }
 }
 
-void Source::feedContainer()
-{
-    char s = getc(inputFile);
-    charContainer.push(s);
-}
 /**
  * Pobieranie nastepnego znaku z pliku zrodlowego
  * @return Akutalny znak pliku zrodlowego
  */
 char Source::getNextChar()
 {
-
-    if (charContainer.empty()) feedContainer();
-    char c = charContainer.front();
+    char c = (char)getc(inputFile);
     switch (c)
     {
-        case '\t':
-        {
-            column_number+=8;
-            break;
-        }
         case '\n':
         {
             column_number=0;
@@ -63,17 +51,7 @@ char Source::getNextChar()
             break;
         }
     }
-    charContainer.pop();
     return c;
-}
-/**
- *
- * @return
- */
-char Source::checkChar()
-{
-    if (charContainer.empty()) feedContainer();
-    return charContainer.front();
 }
 
 

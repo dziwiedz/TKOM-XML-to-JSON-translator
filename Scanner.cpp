@@ -4,9 +4,7 @@
 
 #include "Scanner.h"
 #include <iostream>
-#include <string>
-#include <cctype>
-#include <stdio.h>
+
 
 Scanner::~Scanner() {
 
@@ -14,178 +12,328 @@ Scanner::~Scanner() {
 
 Scanner::Scanner(Source &s) : src(s) {
     scanErrors = 0;
-    //nextc();
+    nextc();
 }
-
+/**
+ * Pobiera kolejny znak z zrodla
+ */
 void Scanner::nextc() {
     c = src.getNextChar();
 }
-
+/**
+ * Wyswietla komunikat o bledzie i numerze lini oraz wiersza w ktorym wystapil.
+ * Konczy dzialanie programu.
+ * @param errorMessage
+ */
 void Scanner::scanError(string errorMessage) {
     cout << "Lexer error (" << src.getLine_number() << "," << src.getColumn_number() << "). " << errorMessage << endl;
     scanErrors++;
+    exit(1);
 }
 
-void Scanner::skipChar(int number)
-{
-    for (int i=0; i<number && c!=EOF;++i)
-    {
-        nextc();
-    }
-}
-
-char Scanner::getCharAfterCurrent() {
-    return src.checkChar();
-}
-
-bool Scanner::checkCDATASpelling() {
-    string cdata = "CDATA[";
-    for (int i=0;i <6;++i)
-    {
-        nextc();
-        if (c==EOF || c!=cdata[i]) return false;
-    }
-    return true;
-}
-
-bool Scanner::isCorrectTextChar(char s) {
-    return (isalpha(s) || s == '_' || s == '-' || isdigit(s) || s =='\'');
-}
-
-bool Scanner::isWhitespace(char s) {
-    return (s == ' ' || s=='\n' || s =='\t');
-}
-
-
-
-Token Scanner::nextToken() {
-    string text = "";
+/**
+ * Pobiera i zwraca kolejny znak z zrodla
+ * @return
+ */
+char Scanner::getNextChar() {
     nextc();
-    while (c!=EOF && isWhitespace(c) ) nextc();//Skipping whitespaces
+    return c;
+}
+
+/**
+ * Simple text cannot contain whitespace
+ * @return True if current char isn't whitespace
+ */
+bool Scanner::isCorrectTextChar() {
+    return (isalpha(c) || c == '_' || c == '-' || isdigit(c) || c =='\'');
+}
+/**
+ * Check if current char is whitespace
+ * @return True if current char is whitespace
+ */
+bool Scanner::isWhitespace() {
+    return (c == ' ' || c=='\n' || c =='\t');
+}
+
+
+/**
+ * Podaje nastepny token.
+ * Konwencja: Po znalezniu tokena, ustawia skaner na pierwszym nieprzeczytanym znaku.
+ * @return Next token
+ */
+Token Scanner::nextToken() {
+    while (c!=EOF && isWhitespace() ) nextc();//Skipping whitespaces
     if (c == EOF) return Token(END_OF_FILE, "EOF", src.getLine_number(), src.getColumn_number());
 
     switch (c) {
         //open tag
         case '<': {
-            //nextc();
-            // Close Tag
-            switch(getCharAfterCurrent())
-            {
-                case '/':
-                {
-                    nextc();
-                    return Token(CLOSE_TAG,"</", src.getLine_number(), src.getColumn_number());
-                }
-                case '?':
-                {
-                    skipChar(2); // Skip to next position after "<?"
-                    while (c != EOF && c != '?') {
-                        text += c;
-                        nextc();
-                    }
-                    if (c == EOF) {
-                        scanError("Unexpected end of file.");
-                    } else {
-                        nextc();
-                        if (c != '>') scanError("Expected '>' after '?'.");
-
-                    }
-                    return Token(PROLOG_TAG, text, src.getLine_number(), src.getColumn_number());
-                }
-                case '!':
-                {
-                    skipChar(2); //Skip to next position after "<!"
-                    if (c == '-') //comment
-                    {
-                        nextc();
-                        if (c != '-') scanError("Expected double '-'");
-                        while (c != EOF && c != '-' && getCharAfterCurrent() != '-') {
-                            text += c;
-                            nextc();
-                        }
-                        if (c == EOF) scanError("Unexpected end of file.");
-                        else {
-                            skipChar(2);
-                            if (c != '>') scanError("Expected '>' After '--'.");
-                        }
-                        return Token(COMMENT_TAG, "", src.getLine_number(), src.getColumn_number());
-                    } else if (c == '[') // CDATA
-                    {
-                        if (!checkCDATASpelling()) {
-                            if (c == EOF) scanError("Unexpected end of file.");
-                            else scanError("CDATA spelling error");
-                        } else {
-                            while (c != EOF && c != '[' && getCharAfterCurrent() != '[') {
-                                nextc();
-                                text += c;
-                            }
-                            if (c == EOF) scanError("Unexpected end of file.");
-                            else {
-                                skipChar(2);
-                                if (c == EOF) scanError("Unexpected end of file.");
-                                else if (c != '>') scanError("Expected '>'.");
-                            }
-                        }
-                        return Token(CDATA_TAG, "", src.getLine_number(), src.getColumn_number());
-                    }
-                    else
-                    {
-                        /*<! ....*/
-                    }
-                }
-                default:
-                {
-                    return Token(START_TAG, "<", src.getLine_number(), src.getColumn_number());
-                }
-            }
+            nextc();
+            return processLeftLessSign();
         }
             //end tag
         case '>': {
+            nextc();
             return Token(END_TAG, ">", src.getLine_number(), src.getColumn_number());
         }
             //empty tag
         case '/': {
             nextc();
             if (c != '>') scanError("Missing '>' after '/'");
-            return Token(EMPTY_TAG, "/>", src.getLine_number(), src.getColumn_number());
+            return Token(END_EMPTY_TAG, "/>", src.getLine_number(), src.getColumn_number());
         }
             //equal tag
         case '=': {
+            nextc();
             return Token(EQUAL_TAG, "=", src.getLine_number(), src.getColumn_number());
         }
             /*Atributtes can be opened by ' or " */
         case '\'': {
-            return processAtributte();
+            return processQuotedText();
         }
         case '"': {
-            return processAtributte();
+            return processQuotedText();
         }
         default: //Simple Text
         {
+            string text = "";
             text+=c;
-            while (getCharAfterCurrent()!=EOF && isCorrectTextChar(getCharAfterCurrent()))
+            while (getNextChar()!=EOF && isCorrectTextChar())
             {
-                nextc();
                 text+=c;
             }
             //if (c==EOF) scanError("Unexpected end of file");
+            //nextc();
             return Token(SIMPLE_TEXT, text, src.getLine_number(), src.getColumn_number());
         }
 
     }
 }
 
-Token Scanner::processAtributte() {
-    string s = "";
-    char endQuote = c;
+/**
+ * Analiza znacznika rozpoczynajacego sie od znaku '<'
+ * Analiza rozpoczyna sie na nastepnym znaku po wystapieniu '<'
+ * @return
+ */
+Token Scanner::processLeftLessSign()
+{
+    switch (c)
+    {
+        case '/': // </ Close Tag
+        {
+            nextc(); //
+            return Token(START_CLOSE_TAG,"</", src.getLine_number(), src.getColumn_number());
+        }
+
+        case '?': // Prolog <? PROLOG ?>
+        {
+            return processProlog();
+        }
+        case '!':
+        {
+            nextc();
+            switch (c)
+            {
+                case '-': // <!-- Comment -->
+                {
+                    return processComment();
+                }
+                case '[': // <[CData[ ... ]]>
+                {
+                    return processCdata();
+                }
+                default: //<!Doctype ... >
+                {
+                    return processDoctype();
+                }
+            }
+        }
+        default: // <
+        {
+            return Token(START_TAG, "<", src.getLine_number(), src.getColumn_number());
+        }
+
+    }
+}
+/**
+ * Analiza poprawnosci tokenu typu Prolog : <? ... ?>
+ * Analiza rozpoczyna sie po pierwszym wsytapieniu znaku '?'
+ * @return Token typu prolog
+ */
+Token Scanner::processProlog() {
+    string text = "";
+    while (getNextChar()!=EOF && c!='?') text+=c;
+    if (c == EOF) scanError("Unexpected end of file.");
+    else {
+        if (getNextChar() != '>') scanError("Expected '>' after '?'.");
+
+    }
     nextc();
-    while (c != EOF && !isWhitespace(c) && c != endQuote) {
-        s += c;
-        nextc();
+    return Token(PROLOG, text, src.getLine_number(), src.getColumn_number());
+
+}
+/**
+ * Analiza poprawnosci tokenu typu Comment <!-- ... -->
+ * Analiza rozpoczyna sie po pierwszym wystapieniu znaku '-'
+ * @return
+ */
+Token Scanner::processComment() {
+    if (getNextChar() != '-') scanError("Expected double '-'");
+    bool dashAppeared = false;
+    while (getNextChar() != EOF && !(c=='-' && dashAppeared)) {
+        dashAppeared = (c=='-');
     }
     if (c == EOF) scanError("Unexpected end of file.");
-    if (isWhitespace(c)) scanError("Atributtes cant have whitespaces.");
-    if (c!=endQuote) scanError("Atributtes must be closed by the same quote ");
+    else if (getNextChar() != '>') scanError("Expected '>' After '--'.");
+    nextc();
+    return Token(COMMENT, "", src.getLine_number(), src.getColumn_number());
+}
+/**
+ * Analiza tokenu typu CDATA
+ * Analiza rozpoczyna sie od znaku '['.
+ * @return
+ */
+Token Scanner::processCdata() {
 
-    return Token(ATRIBBUTE, s, src.getLine_number(), src.getColumn_number());
+    if (!checkCDATASpelling()) {
+        if (c == EOF) scanError("Unexpected end of file.");
+        else scanError("CDATA spelling error");
+    }
+
+    bool squareBracketAppered = false;
+    while (getNextChar()!=EOF && !(c==']' && squareBracketAppered)) {
+        squareBracketAppered = (c==']');
+    }
+    if (c == EOF) scanError("Unexpected end of file.");
+    if ( getNextChar() != '>') scanError("Expected '>' After ']]'.");
+    nextc();
+    return Token(CDATA, "", src.getLine_number(), src.getColumn_number());
+}
+
+/**
+ * Check if CDATA is properly formated
+ * @return True if properly formated, false if not
+ */
+bool Scanner::checkCDATASpelling() {
+    string cdata = "CDATA[";
+    for (int i=0;i <6;++i)
+    {
+        if (getNextChar()==EOF || c!=cdata[i]) return false;
+    }
+    return true;
+}
+
+/**
+ * Analiza tokenu typu DOCTYPE
+ * @return
+ */
+Token Scanner::processDoctype() {
+
+    if (!checkDoctypeSpelling()) {
+        if (c == EOF) scanError("Unexpected end of file.");
+        else scanError("DOCTYPE spelling error");
+    }
+
+    while (c!=EOF && c!='>') nextc();
+    if (c!='>') scanError("Unexpected end of file.");
+    nextc();
+    return Token(DOCTYPE, "", src.getLine_number(), src.getColumn_number());
+}
+
+/**
+ * Check if DOCTYPE is properly formated
+ * @return True if properly formated, false if not
+ */
+bool Scanner::checkDoctypeSpelling() {
+    string doctype ="DOCTYPE";
+    for (int i =0; i <7 ; ++i)
+    {
+        if (c==EOF || c!=doctype[i]) return false;
+        nextc();
+    }
+    return true;
+}
+
+/**
+ * Analiza tekstu cytowanego
+ * @return
+ */
+Token Scanner::processQuotedText() {
+    string s = "";
+    char endQuote = c;
+    while (getNextChar() != EOF && !isWhitespace() && c != endQuote) {
+        if (c == '&') s+=processCharacterEntity();
+        else s += c;
+    }
+    if (c == EOF) scanError("Unexpected end of file.");
+    if (isWhitespace()) scanError("Quoted text can't have whitespaces.");
+    if (c!=endQuote) scanError("Quoted text must be closed by the same quote ");
+    nextc();
+    return Token(QUOTED_TEXT, s, src.getLine_number(), src.getColumn_number());
+}
+
+/**
+ * &lt;   change to <
+ * &gt;   change to >
+ * &amp;  change to  &
+ * &apos; change to '
+ * &quot; change to "
+ * @return
+ */
+char Scanner::processCharacterEntity() {
+    nextc();
+    switch (c)
+    {
+        case 'l':
+        {
+            if ( getNextChar() == 't' && getNextChar() == ';') return '<';
+            else scanError("Not properly formated \"&lt;\"");
+        }
+        case 'g':
+        {
+            if (getNextChar() == 't' && getNextChar() == ';') return '>';
+            else scanError("Not properly formated \"&gt;\"");
+        }
+        case 'a':
+        {
+            nextc();
+            switch (c)
+            {
+                case 'm': // &amp;
+                {
+                    if (   getNextChar() == 'p' &&
+                           getNextChar() == ';')
+                        return '&';
+                    else scanError("Wrong formated \"&mp;\"");
+                }
+                case 'p': // &apos;
+                {
+                    if (    getNextChar() == 'o' &&
+                            getNextChar() == 's' &&
+                            getNextChar() == ';')
+                        return '\'';
+                    else scanError("Wrong formated \"apos;\"");
+                }
+                default :
+                {
+                    scanError("Not properly formated entity.");
+                }
+            }
+        }
+        case 'q':
+        {
+            if (    getNextChar() == 'u' &&
+                    getNextChar() == 'o' &&
+                    getNextChar() == 't' &&
+                    getNextChar() == ';')
+                return '"';
+            else scanError("Wrong formated \"quot;\"");
+        }
+        default:
+        {
+            scanError("Expected name of entity after '&'");
+            return '\0';
+        }
+    }
+
 }

@@ -4,7 +4,7 @@
 
 #include "Parser.h"
 
-Parser::Parser(Scanner &scn) : scn(s) {}
+Parser::Parser(Scanner &s) : scn(s) {}
 
 Parser::~Parser() {
 

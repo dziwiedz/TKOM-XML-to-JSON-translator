@@ -21,26 +21,37 @@ class Scanner
 
     void nextc();
 
-    void skipChar(int number);
-
     void scanError(string errorMessage);
 
-    char getCharAfterCurrent();
+    char getNextChar();
+
+    char processCharacterEntity();
 
     bool checkCDATASpelling();
 
-    bool isCorrectTextChar(char s);
+    bool checkDoctypeSpelling();
 
-    bool isWhitespace(char s);
+    bool isCorrectTextChar();
 
-    Token processAtributte();
+    bool isWhitespace();
+
+    Token processQuotedText();
+
+    Token processLeftLessSign();
+
+    Token processProlog();
+
+    Token processComment();
+
+    Token processCdata();
+
+    Token processDoctype();
 
 
 public:
     Scanner(Source &s);
 
     virtual ~Scanner();
-
 
     Token nextToken();
 
