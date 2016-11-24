@@ -28,7 +28,6 @@ enum Atoms
     END_EMPTY_TAG, // '/>'
 
     QUOTED_TEXT, // <note ATTRIBUTE='12'> </note>
-
     EQUAL_TAG, // '='
     DOCTYPE, //
     END_OF_FILE

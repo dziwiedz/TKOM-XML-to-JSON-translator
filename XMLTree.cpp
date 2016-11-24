@@ -3,3 +3,13 @@
 //
 
 #include "XMLTree.h"
+
+XMLTree::~XMLTree() {
+
+}
+
+XMLTree::XMLTree() {}
+
+void XMLTree::writeToJS() {
+
+}

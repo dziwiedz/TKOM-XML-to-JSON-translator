@@ -1,12 +1,23 @@
 //
 // Created by Łukasz Niedźwiedź on 01/11/16.
 //
+#include "XMLNode.h"
 
 #ifndef TKOM_XMLTREE_H
 #define TKOM_XMLTREE_H
 
 
 class XMLTree {
+
+    XMLNode *rootElement;
+
+public:
+    virtual ~XMLTree();
+
+    XMLTree();
+
+    void writeToJS();
+
 
 };
 

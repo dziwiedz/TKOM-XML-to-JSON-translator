@@ -19,13 +19,13 @@ class Scanner
 
     unsigned int scanErrors;
 
-    void nextc();
+    void nextc(); //ustawia wskaznik na nastepny znak
 
-    void scanError(string errorMessage);
+    void scanError(string errorMessage); // wyswietlanie komunikatu o bledzie
 
-    char getNextChar();
+    char getNextChar(); // ustawia wskaznik na nastepny znak i go zwraca
 
-    char processCharacterEntity();
+    char processCharacterEntity(); // rozpoznanie znakow specjalnych
 
     bool checkCDATASpelling();
 
