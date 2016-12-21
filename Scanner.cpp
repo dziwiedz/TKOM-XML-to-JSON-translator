@@ -52,7 +52,7 @@ bool Scanner::isCorrectTextChar() {
  * @return True if current char is whitespace
  */
 bool Scanner::isWhitespace() {
-    return (c == ' ' || c=='\n' || c =='\t');
+    return isspace(c);
 }
 
 
@@ -61,7 +61,7 @@ bool Scanner::isWhitespace() {
  * Konwencja: Po znalezniu tokena, ustawia skaner na pierwszym nieprzeczytanym znaku.
  * @return Next token
  */
-Token Scanner::nextToken() {
+Token Scanner::nextToken(bool skipSpaces) {
     while (c!=EOF && isWhitespace() ) nextc();//Skipping whitespaces
     if (c == EOF) return Token(END_OF_FILE, "EOF", src.getLine_number(), src.getColumn_number());
 
@@ -98,7 +98,7 @@ Token Scanner::nextToken() {
         {
             string text = "";
             text+=c;
-            while (getNextChar()!=EOF && isCorrectTextChar())
+            while (getNextChar()!=EOF && (isCorrectTextChar() || (!skipSpaces && isWhitespace())))
             {
                 text+=c;
             }
@@ -169,7 +169,7 @@ Token Scanner::processProlog() {
 
     }
     nextc();
-    return Token(PROLOG, text, src.getLine_number(), src.getColumn_number());
+    return Token(PROCESS_INST, text, src.getLine_number(), src.getColumn_number());
 
 }
 /**

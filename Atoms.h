@@ -18,7 +18,7 @@ enum ScanErrors
 enum Atoms
 {
     COMMENT, // <!-- COMMENT -->
-    PROLOG, // <?xml version="1.0" encoding="UTF-8"?>
+    PROCESS_INST, // <?xml version="1.0" encoding="UTF-8"?>
     SIMPLE_TEXT,
     CDATA, // <![CDATA[ ... ]]>
 

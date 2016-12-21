@@ -4,8 +4,7 @@
 
 #include "XMLNode.h"
 
-XMLNode::XMLNode() {
-
+XMLNode::XMLNode(XMLNode* p) : parent(p) {
 
 
 }
@@ -20,4 +19,8 @@ bool XMLNode::isIsArg() const {
 
 const string &XMLNode::getValue() const {
     return value;
+}
+
+void XMLNode::setValue(const string &value) {
+    XMLNode::value = value;
 }

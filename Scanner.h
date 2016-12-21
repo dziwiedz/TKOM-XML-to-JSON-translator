@@ -53,7 +53,7 @@ public:
 
     virtual ~Scanner();
 
-    Token nextToken();
+    Token nextToken(bool);
 
 
 };
