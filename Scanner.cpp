@@ -45,7 +45,7 @@ char Scanner::getNextChar() {
  * @return True if current char isn't whitespace
  */
 bool Scanner::isCorrectTextChar() {
-    return (isalpha(c) || c == '_' || c == '-' || isdigit(c) || c =='\'');
+    return (isalpha(c) || isdigit(c) || (ispunct(c) && c!='<' && c!='=' && c!='>')); //Powinno byc bez c!='=' ..., zrobione tylko do testow
 }
 /**
  * Check if current char is whitespace
@@ -61,7 +61,7 @@ bool Scanner::isWhitespace() {
  * Konwencja: Po znalezniu tokena, ustawia skaner na pierwszym nieprzeczytanym znaku.
  * @return Next token
  */
-Token Scanner::nextToken(bool skipSpaces) {
+Token Scanner::nextToken(bool keepSpaces) {
     while (c!=EOF && isWhitespace() ) nextc();//Skipping whitespaces
     if (c == EOF) return Token(END_OF_FILE, "EOF", src.getLine_number(), src.getColumn_number());
 
@@ -96,18 +96,23 @@ Token Scanner::nextToken(bool skipSpaces) {
         }
         default: //Simple Text
         {
-            string text = "";
-            text+=c;
-            while (getNextChar()!=EOF && (isCorrectTextChar() || (!skipSpaces && isWhitespace())))
-            {
-                text+=c;
-            }
-            //if (c==EOF) scanError("Unexpected end of file");
-            //nextc();
-            return Token(SIMPLE_TEXT, text, src.getLine_number(), src.getColumn_number());
+            return processText(keepSpaces);
         }
-
     }
+}
+
+Token Scanner::processText(bool keepSpaces) {
+    string text = "";
+    text+=c;
+    while (getNextChar()!=EOF && (isCorrectTextChar() || (keepSpaces && isWhitespace())))
+    {
+        if (c=='&') text+=processCharacterEntity();
+        else text+=c;
+    }
+    //if (c==EOF) scanError("Unexpected end of file");
+    //nextc();
+    if (keepSpaces) return Token(SIMPLE_TEXT, text, src.getLine_number(), src.getColumn_number());
+    else return Token(ATTRIBUTE_NAME, text, src.getLine_number(), src.getColumn_number());
 }
 
 /**
@@ -199,15 +204,16 @@ Token Scanner::processCdata() {
         if (c == EOF) scanError("Unexpected end of file.");
         else scanError("CDATA spelling error");
     }
-
+    string value = "";
     bool squareBracketAppered = false;
     while (getNextChar()!=EOF && !(c==']' && squareBracketAppered)) {
         squareBracketAppered = (c==']');
+        value += c;
     }
     if (c == EOF) scanError("Unexpected end of file.");
     if ( getNextChar() != '>') scanError("Expected '>' After ']]'.");
     nextc();
-    return Token(CDATA, "", src.getLine_number(), src.getColumn_number());
+    return Token(CDATA, value, src.getLine_number(), src.getColumn_number());
 }
 
 /**
@@ -335,5 +341,4 @@ char Scanner::processCharacterEntity() {
             return '\0';
         }
     }
-
 }

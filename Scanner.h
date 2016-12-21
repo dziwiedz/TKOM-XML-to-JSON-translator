@@ -47,6 +47,8 @@ class Scanner
 
     Token processDoctype();
 
+    Token processText(bool);
+
 
 public:
     Scanner(Source &s);

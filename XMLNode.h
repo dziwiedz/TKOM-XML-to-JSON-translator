@@ -13,20 +13,29 @@ using namespace std;
 class XMLNode {
 
     XMLNode *parent;
-    string value;
-    list <XMLNode*> childrensList;
+    string text;
+    string name;
+    vector <XMLNode*> childrensList;
     vector<Attribute> argList;
 
 
 public:
     XMLNode(XMLNode*);
+    XMLNode();
 
-    void setValue(const string &value);
+    const string &getText() const;
+
+    void setText(const string &text);
+
+    const string &getName() const;
+
+    void setName(const string &name);
 
     virtual ~XMLNode();
     bool hasChild();
     void addChild(XMLNode* newChild);
-    const string &getValue() const;
+    void addAttribute(Attribute arg);
+    void print();
 
 };
 

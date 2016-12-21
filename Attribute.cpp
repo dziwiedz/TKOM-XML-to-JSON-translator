@@ -3,6 +3,7 @@
 //
 
 #include "Attribute.h"
+#include <iostream>
 
 const string &Attribute::getAttributeName() const {
     return attributeName;
@@ -24,3 +25,7 @@ Attribute::Attribute(const string &attributeName, const string &attributeValue) 
                                                                                   attributeValue(attributeValue) {}
 
 Attribute::Attribute() {}
+
+void Attribute::print() {
+    cout<< attributeName << ":" << attributeValue << ";";
+}

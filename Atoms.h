@@ -20,6 +20,7 @@ enum Atoms
     COMMENT, // <!-- COMMENT -->
     PROCESS_INST, // <?xml version="1.0" encoding="UTF-8"?>
     SIMPLE_TEXT,
+    ATTRIBUTE_NAME,
     CDATA, // <![CDATA[ ... ]]>
 
     START_TAG, // '<'
@@ -32,6 +33,6 @@ enum Atoms
     DOCTYPE, //
     END_OF_FILE
 };
-static const char * EnumStrings[] = { "COMMENT", "PROLOGG", "SIMPLE_TEXT","CDATA","START_TAG","START_CLOSE_TAG","END_TAG","END_EMPTY_TAG","QUOTED_TEXT","EQUAL_TAG","DOCTYPE","END_OF_FILE"};
+static const char * EnumStrings[] = { "COMMENT", "PROLOGG", "SIMPLE_TEXT","ATTRIBUTE NAME" ,"CDATA","START_TAG","START_CLOSE_TAG","END_TAG","END_EMPTY_TAG","QUOTED_TEXT","EQUAL_TAG","DOCTYPE","END_OF_FILE"};
 
 #endif //TKOM_ATOMS_H

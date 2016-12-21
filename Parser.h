@@ -15,7 +15,7 @@ class Parser {
     Token backToken;
     stack<string> elementStack;
 
-    XMLNode* parseElement(XMLNode*);
+    XMLNode* parseElement();
     bool parseContent(XMLNode*);
     bool parseOpenBody(XMLNode*);
     bool parseCloseBody(XMLNode*);
