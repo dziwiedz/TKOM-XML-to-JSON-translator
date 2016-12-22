@@ -11,8 +11,12 @@ int main() {
     Scanner sc(s);
     Parser parser(sc);
     XMLNode *rootElement;
-
     rootElement = parser.parse();
+    if (rootElement==NULL)
+    {
+        cout << "Niepoprawny plik XML.\n";
+        return 0;
+    }
     cout << "Done\n";
     rootElement->print();
     vector<Token> vt;

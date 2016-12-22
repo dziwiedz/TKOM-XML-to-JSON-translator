@@ -11,8 +11,7 @@ Parser::~Parser() {
 
 }
 /**
- *
- *
+ * Pobranie nastepnego tokena, bez uwzgledniania spacji
  * @return
  */
 Atoms Parser::getNextToken() {
@@ -20,7 +19,10 @@ Atoms Parser::getNextToken() {
     cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
     return token.getTokenType();
 }
-
+/**
+ * Pobranie nastepnego tokena, z uwzglednieniem bialych znakow
+ * @return
+ */
 Atoms Parser::getNextTokenWithSpaces() {
     token = scn.nextToken(true);
     cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
@@ -36,24 +38,23 @@ Atoms Parser::tokenType() {
 
 /**
  * Procedura ropozycznajaca parsowanie pliku XML.
+ * XML_TREE = Misc* Element Misc* ;
  * @return Korzen drzewa XML
  */
 XMLNode* Parser::parse() {
     XMLNode* rootElement;
-    parseMiscelanus();
+    while(parseMiscelanus());
     rootElement = parseElement();
-    parseMiscelanus();
-    cout << EnumStrings[tokenType()] << endl;
+    while(parseMiscelanus());
     if (tokenType()!=END_OF_FILE)
     {
         //error
         return NULL;
     }
-    cout << EnumStrings[tokenType()] << endl;
     return rootElement;
 }
 /**
- *
+ * Element = OpenBody ( END_EMPTY_TAG | END_TAG Content* CloseBody) ;
  * @return wskaznik na element
  */
 XMLNode* Parser::parseElement() {
@@ -93,7 +94,11 @@ XMLNode* Parser::parseElement() {
         }
     }
 }
-
+/**
+ * OpenBody = START_TAG Name Atributte* ;
+ * @param element
+ * @return
+ */
 bool Parser::parseOpenBody(XMLNode *element)
 {
     if (tokenType()!=START_TAG)
@@ -111,7 +116,11 @@ bool Parser::parseOpenBody(XMLNode *element)
     while (parseAttributes(element));
     return true;
 }
-
+/**
+ * Content = Misc | CDATA_TAG | Text | Element ;
+ * @param element
+ * @return
+ */
 bool Parser::parseContent(XMLNode *element)
 {
     switch(getNextTokenWithSpaces())
@@ -149,7 +158,11 @@ bool Parser::parseContent(XMLNode *element)
         default: return false;
     }
 }
-
+/**
+ * OpenBody = START_TAG Name Atributte* ;
+ * @param element wskaznik na akutalny wezel
+ * @return true - jezeli poprawnie wykonano parsowanie, false w przeciwnym wypadku
+ */
 bool Parser::parseCloseBody(XMLNode *element)
 {
     if (tokenType()!=START_CLOSE_TAG)
@@ -175,7 +188,11 @@ bool Parser::parseCloseBody(XMLNode *element)
     }
     return true;
 }
-
+/**
+ * Atributte = AttributeName, EQUAL_TAG, ATTRIBUTE_VALUE ;
+ * @param element
+ * @return
+ */
 bool Parser::parseAttributes(XMLNode *element) {
     Attribute attr;
     if(getNextToken()!=ATTRIBUTE_NAME)
@@ -198,6 +215,10 @@ bool Parser::parseAttributes(XMLNode *element) {
     element->addAttribute(attr);
     return true;
 }
+/**
+ * Misc = DOCTYPE_TAG | COMMENT_TAG | PROCESS_INST ;
+ * @return
+ */
 bool Parser::parseMiscelanus()
 {
     switch (getNextToken())
@@ -212,7 +233,10 @@ bool Parser::parseMiscelanus()
             return false;
     }
 }
-
+/**
+ *
+ * @return
+ */
 Attribute Parser::cdataToAttribute()
 {
     return Attribute("_cdata",token.getTokenField());
