@@ -29,3 +29,7 @@ int Token::getColumn() const {
 const string &Token::getTokenField() const {
     return tokenField;
 }
+
+const string Token::getTokenTypeString(){
+    return EnumStrings[tokenType];
+}

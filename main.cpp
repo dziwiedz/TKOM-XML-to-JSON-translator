@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Source.h"
-#include "Scanner.h"
+#include "Lexer.h"
 #include "Parser.h"
 #include <vector>
 
@@ -8,7 +8,7 @@ int main() {
     std::cout << "Hello, World!" << std::endl;
 
     Source s("/Users/Dzwiedz/ClionProjects/TKOM/test.xml");
-    Scanner sc(s);
+    Lexer sc(s);
     Parser parser(sc);
     XMLNode *rootElement;
     rootElement = parser.parse();

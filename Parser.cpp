@@ -5,7 +5,7 @@
 #include "Parser.h"
 #include <iostream>
 
-Parser::Parser(Scanner &s) : scn(s) {}
+Parser::Parser(Lexer &s) : scn(s) {}
 
 Parser::~Parser() {
 
@@ -240,4 +240,13 @@ bool Parser::parseMiscelanus()
 Attribute Parser::cdataToAttribute()
 {
     return Attribute("_cdata",token.getTokenField());
+}
+
+void Parser::wrongTokenException(string expected)
+{
+    throw WrongTokenTypeException(expected,token.getTokenTypeString(),token.getLine(),token.getColumn());
+}
+void Parser::stackException(string expected)
+{
+    throw NameStackException(expected,token.getTokenField(),token.getLine(),token.getColumn());
 }

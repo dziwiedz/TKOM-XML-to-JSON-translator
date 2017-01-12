@@ -8,11 +8,21 @@
 
 #include "Source.h"
 #include "Token.h"
+#include "LexerExceptions.h"
 /**
  * Skaner.
  */
-class Scanner
+class Lexer
 {
+public:
+    Lexer(Source &s);
+
+    virtual ~Lexer();
+
+    Token nextToken(bool);
+
+private:
+
     Source& src;
 
     char c;
@@ -49,13 +59,9 @@ class Scanner
 
     Token processText(bool);
 
+//    @TODO Dodac przycinania SimpleText od prawej strony
 
-public:
-    Scanner(Source &s);
 
-    virtual ~Scanner();
-
-    Token nextToken(bool);
 
 
 };

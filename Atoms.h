@@ -5,15 +5,6 @@
 #ifndef TKOM_ATOMS_H
 #define TKOM_ATOMS_H
 
-enum SymType
-{
-
-};
-
-enum ScanErrors
-{
-
-};
 
 enum Atoms
 {
@@ -22,17 +13,28 @@ enum Atoms
     SIMPLE_TEXT,
     ATTRIBUTE_NAME,
     CDATA, // <![CDATA[ ... ]]>
-
     START_TAG, // '<'
     START_CLOSE_TAG, // '</'
     END_TAG, // '>'
     END_EMPTY_TAG, // '/>'
-
     QUOTED_TEXT, // <note ATTRIBUTE='12'> </note>
     EQUAL_TAG, // '='
     DOCTYPE, //
     END_OF_FILE
 };
-static const char * EnumStrings[] = { "COMMENT", "PROLOGG", "SIMPLE_TEXT","ATTRIBUTE NAME" ,"CDATA","START_TAG","START_CLOSE_TAG","END_TAG","END_EMPTY_TAG","QUOTED_TEXT","EQUAL_TAG","DOCTYPE","END_OF_FILE"};
+static const char * EnumStrings[] = { "COMMENT",
+                                      "PROCESS_INST",
+                                      "SIMPLE_TEXT",
+                                      "ATTRIBUTE_NAME" ,
+                                      "CDATA",
+                                      "START_TAG",
+                                      "START_CLOSE_TAG",
+                                      "END_TAG",
+                                      "END_EMPTY_TAG",
+                                      "QUOTED_TEXT",
+                                      "EQUAL_TAG",
+                                      "DOCTYPE",
+                                      "END_OF_FILE"
+};
 
 #endif //TKOM_ATOMS_H

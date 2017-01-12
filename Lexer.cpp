@@ -2,22 +2,22 @@
 // Created by Łukasz Niedźwiedź on 29/10/16.
 //
 
-#include "Scanner.h"
+#include "Lexer.h"
 #include <iostream>
 
 
-Scanner::~Scanner() {
+Lexer::~Lexer() {
 
 }
 
-Scanner::Scanner(Source &s) : src(s) {
+Lexer::Lexer(Source &s) : src(s) {
     scanErrors = 0;
     nextc();
 }
 /**
  * Pobiera kolejny znak z zrodla
  */
-void Scanner::nextc() {
+void Lexer::nextc() {
     c = src.getNextChar();
 }
 /**
@@ -25,17 +25,15 @@ void Scanner::nextc() {
  * Konczy dzialanie programu.
  * @param errorMessage
  */
-void Scanner::scanError(string errorMessage) {
-    cout << "Lexer error (" << src.getLine_number() << "," << src.getColumn_number() << "). " << errorMessage << endl;
-    scanErrors++;
-    exit(1);
+void Lexer::scanError(string errorMessage) {
+    throw LexerExceptions(src.getLine_number(),src.getColumn_number(),errorMessage);
 }
 
 /**
  * Pobiera i zwraca kolejny znak z zrodla
  * @return
  */
-char Scanner::getNextChar() {
+char Lexer::getNextChar() {
     nextc();
     return c;
 }
@@ -44,14 +42,14 @@ char Scanner::getNextChar() {
  * Simple text cannot contain whitespace
  * @return True if current char isn't whitespace
  */
-bool Scanner::isCorrectTextChar() {
+bool Lexer::isCorrectTextChar() {
     return (isalpha(c) || isdigit(c) || (ispunct(c) && c!='<' && c!='=' && c!='>')); //Powinno byc bez c!='=' ..., zrobione tylko do testow
 }
 /**
  * Check if current char is whitespace
  * @return True if current char is whitespace
  */
-bool Scanner::isWhitespace() {
+bool Lexer::isWhitespace() {
     return isspace(c);
 }
 
@@ -61,7 +59,7 @@ bool Scanner::isWhitespace() {
  * Konwencja: Po znalezniu tokena, ustawia skaner na pierwszym nieprzeczytanym znaku.
  * @return Next token
  */
-Token Scanner::nextToken(bool keepSpaces) {
+Token Lexer::nextToken(bool keepSpaces) {
     while (c!=EOF && isWhitespace() ) nextc();//Skipping whitespaces
     if (c == EOF) return Token(END_OF_FILE, "EOF", src.getLine_number(), src.getColumn_number());
 
@@ -101,7 +99,7 @@ Token Scanner::nextToken(bool keepSpaces) {
     }
 }
 
-Token Scanner::processText(bool keepSpaces) {
+Token Lexer::processText(bool keepSpaces) {
     string text = "";
     text+=c;
     while (getNextChar()!=EOF && (isCorrectTextChar() || (keepSpaces && isWhitespace())))
@@ -120,7 +118,7 @@ Token Scanner::processText(bool keepSpaces) {
  * Analiza rozpoczyna sie na nastepnym znaku po wystapieniu '<'
  * @return
  */
-Token Scanner::processLeftLessSign()
+Token Lexer::processLeftLessSign()
 {
     switch (c)
     {
@@ -165,7 +163,7 @@ Token Scanner::processLeftLessSign()
  * Analiza rozpoczyna sie po pierwszym wsytapieniu znaku '?'
  * @return Token typu prolog
  */
-Token Scanner::processProlog() {
+Token Lexer::processProlog() {
     string text = "";
     while (getNextChar()!=EOF && c!='?') text+=c;
     if (c == EOF) scanError("Unexpected end of file.");
@@ -182,7 +180,7 @@ Token Scanner::processProlog() {
  * Analiza rozpoczyna sie po pierwszym wystapieniu znaku '-'
  * @return
  */
-Token Scanner::processComment() {
+Token Lexer::processComment() {
     if (getNextChar() != '-') scanError("Expected double '-'");
     bool dashAppeared = false;
     while (getNextChar() != EOF && !(c=='-' && dashAppeared)) {
@@ -198,7 +196,7 @@ Token Scanner::processComment() {
  * Analiza rozpoczyna sie od znaku '['.
  * @return
  */
-Token Scanner::processCdata() {
+Token Lexer::processCdata() {
 
     if (!checkCDATASpelling()) {
         if (c == EOF) scanError("Unexpected end of file.");
@@ -220,7 +218,7 @@ Token Scanner::processCdata() {
  * Check if CDATA is properly formated
  * @return True if properly formated, false if not
  */
-bool Scanner::checkCDATASpelling() {
+bool Lexer::checkCDATASpelling() {
     string cdata = "CDATA[";
     for (int i=0;i <6;++i)
     {
@@ -233,7 +231,7 @@ bool Scanner::checkCDATASpelling() {
  * Analiza tokenu typu DOCTYPE
  * @return
  */
-Token Scanner::processDoctype() {
+Token Lexer::processDoctype() {
 
     if (!checkDoctypeSpelling()) {
         if (c == EOF) scanError("Unexpected end of file.");
@@ -250,7 +248,7 @@ Token Scanner::processDoctype() {
  * Check if DOCTYPE is properly formated
  * @return True if properly formated, false if not
  */
-bool Scanner::checkDoctypeSpelling() {
+bool Lexer::checkDoctypeSpelling() {
     string doctype ="DOCTYPE";
     for (int i =0; i <7 ; ++i)
     {
@@ -264,7 +262,7 @@ bool Scanner::checkDoctypeSpelling() {
  * Analiza tekstu cytowanego
  * @return
  */
-Token Scanner::processQuotedText() {
+Token Lexer::processQuotedText() {
     string s = "";
     char endQuote = c;
     while (getNextChar() != EOF && !isWhitespace() && c != endQuote) {
@@ -286,7 +284,7 @@ Token Scanner::processQuotedText() {
  * &quot; change to "
  * @return
  */
-char Scanner::processCharacterEntity() {
+char Lexer::processCharacterEntity() {
     nextc();
     switch (c)
     {

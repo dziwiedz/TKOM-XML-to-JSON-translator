@@ -9,8 +9,9 @@
 #include <string>
 using namespace std;
 class Token {
+private:
     Atoms tokenType;
-    std::string tokenField;
+    string tokenField;
     int line;
     int column;
 public:
@@ -21,6 +22,8 @@ public:
     virtual ~Token();
 
     Atoms getTokenType() const;
+
+    const string getTokenTypeString();
 
     int getLine() const;
 

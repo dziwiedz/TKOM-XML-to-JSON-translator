@@ -6,11 +6,12 @@
 #define TKOM_PARSER_H
 
 
-#include "Scanner.h"
+#include "Lexer.h"
 #include "XMLTree.h"
+#include "ParserExceptions.h"
 #include <stack>
 class Parser {
-    Scanner& scn;
+    Lexer& scn;
     Token token;
     Token backToken;
     stack<string> elementStack;
@@ -26,8 +27,13 @@ class Parser {
     Atoms tokenType();
     Attribute cdataToAttribute();
 
+//    Parse error functions
+    void wrongTokenException(string);
+    void stackException(string);
+
+
 public:
-    Parser(Scanner &s);
+    Parser(Lexer &s);
 
     virtual ~Parser();
 
