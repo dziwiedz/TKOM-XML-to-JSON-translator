@@ -7,35 +7,29 @@
 
 #ifndef TKOM_XMLNODE_H
 #define TKOM_XMLNODE_H
-#include "Attribute.h"
 #include <vector>
+enum NodeType {TextNode, ElementNode, AttributeNode};
 using namespace std;
+
+
+
+/**
+ * Klasa reprezentujaca wezel drzewa XML.
+ * Domyslnie reprezentuje Simple Text.
+ * Name - Simple Text
+ */
 class XMLNode {
-
-    XMLNode *parent;
-    string text;
-    string name;
-    vector <XMLNode*> childrensList;
-    vector<Attribute> argList;
-
-
 public:
-    XMLNode(XMLNode*);
-    XMLNode();
+    XMLNode(const string &name);
 
-    const string &getText() const;
+    bool operator==(const XMLNode& rhs);
 
-    void setText(const string &text);
+    NodeType getNodeType();
 
-    const string &getName() const;
+private:
+    string name;
+    NodeType nodeType;
 
-    void setName(const string &name);
-
-    virtual ~XMLNode();
-    bool hasChild();
-    void addChild(XMLNode* newChild);
-    void addAttribute(Attribute arg);
-    void print();
 
 };
 

@@ -38,17 +38,18 @@ Atoms Parser::tokenType() {
 
 /**
  * Procedura ropozycznajaca parsowanie pliku XML.
+ * Korzeniem drzewa XML musi byc element.
  * XML_TREE = Misc* Element Misc* ;
  * @return Korzen drzewa XML
  */
-XMLNode* Parser::parse() {
-    XMLNode* rootElement;
+XMLElement* Parser::parse() {
+    XMLElement* rootElement;
     while(parseMiscelanus());
     rootElement = parseElement();
     while(parseMiscelanus());
     if (tokenType()!=END_OF_FILE)
     {
-        //error
+        wrongTokenError(EnumStrings[END_OF_FILE]);
         return NULL;
     }
     return rootElement;
@@ -57,13 +58,9 @@ XMLNode* Parser::parse() {
  * Element = OpenBody ( END_EMPTY_TAG | END_TAG Content* CloseBody) ;
  * @return wskaznik na element
  */
-XMLNode* Parser::parseElement() {
-    XMLNode* element = new XMLNode();
-    if (!parseOpenBody(element))
-    {
-        delete element;
-        // error
-    }
+XMLElement* Parser::parseElement() {
+    XMLElement* element;
+    element = parseOpenBody();
     switch(tokenType())
     {
         case(END_EMPTY_TAG):
@@ -79,6 +76,7 @@ XMLNode* Parser::parseElement() {
             {
                 // error
                 delete element;
+                throw ParserException();
                 return NULL;
             }
         }
@@ -89,7 +87,7 @@ XMLNode* Parser::parseElement() {
         }
         default:
         {
-            //error
+            throw ParserException();
             return NULL;
         }
     }
@@ -99,29 +97,28 @@ XMLNode* Parser::parseElement() {
  * @param element
  * @return
  */
-bool Parser::parseOpenBody(XMLNode *element)
+XMLElement* Parser::parseOpenBody()
 {
     if (tokenType()!=START_TAG)
     {
-        //error
-        return false;
+        wrongTokenError(EnumStrings[START_TAG]);
     }
     if (getNextToken()!=ATTRIBUTE_NAME)
     {
-        //error
-        return false;
+        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
     }
+//    XMLNode *element = new XMLNode();
+    XMLElement* element = new XMLElement(token.getTokenField());
     elementStack.push(token.getTokenField());
-    element->setName(token.getTokenField());
-    while (parseAttributes(element));
-    return true;
+    parseAttributes(element);
+    return element;
 }
 /**
  * Content = Misc | CDATA_TAG | Text | Element ;
  * @param element
  * @return
  */
-bool Parser::parseContent(XMLNode *element)
+bool Parser::parseContent(XMLElement *element)
 {
     switch(getNextTokenWithSpaces())
     {
@@ -133,27 +130,27 @@ bool Parser::parseContent(XMLNode *element)
         }
         case(CDATA):
         {
-            element->addAttribute(cdataToAttribute());
+            element->addNewNode(cdataToAttribute());
             return true;
         }
         case(SIMPLE_TEXT):
         {
-            element->setText(token.getTokenField());
+            element->addNewNode(new XMLNode(token.getTokenField()));
             return true;
         }
         case(START_TAG):
         {
-            XMLNode *child = parseElement();
+            XMLElement *child = parseElement();
             if(child!=NULL)
             {
-                element->addChild(child);
+                element->addNewNode(child);
                 return true;
             }
             else
             {
-                //error
-                return false;
+                throw ParserException();
             }
+            return true;
         }
         default: return false;
     }
@@ -163,57 +160,61 @@ bool Parser::parseContent(XMLNode *element)
  * @param element wskaznik na akutalny wezel
  * @return true - jezeli poprawnie wykonano parsowanie, false w przeciwnym wypadku
  */
-bool Parser::parseCloseBody(XMLNode *element)
+bool Parser::parseCloseBody(XMLElement *element)
 {
     if (tokenType()!=START_CLOSE_TAG)
     {
-        //error
+        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
         return false;
     }
     if (getNextToken()!=ATTRIBUTE_NAME)
     {
-        //error
+        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
         return false;
     }
     if (elementStack.top()!=token.getTokenField())
     {
-        //error
+        stackError(elementStack.top());
         return false;
     }
     elementStack.pop();
     if (getNextToken()!=END_TAG)
     {
-        //error
+        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
         return false;
     }
     return true;
 }
 /**
- * Atributte = AttributeName, EQUAL_TAG, ATTRIBUTE_VALUE ;
- * @param element
- * @return
+ *
+ * @return Vector of attributes. Could be empty if element dosen't have any
  */
-bool Parser::parseAttributes(XMLNode *element) {
-    Attribute attr;
+void Parser::parseAttributes(XMLElement* element) {
+    XMLAttribute* attribute;
+    while((attribute=parseSingleAttribute())!= nullptr) element->addNewNode(attribute);
+}
+/**
+ * Atributte = AttributeName, EQUAL_TAG, ATTRIBUTE_VALUE ;
+ * @return Attribute
+ */
+XMLAttribute* Parser::parseSingleAttribute()
+{
+    XMLAttribute* attr;
     if(getNextToken()!=ATTRIBUTE_NAME)
     {
-        //error
-        return false;
+//        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
+        return nullptr;
     }
-    attr.setAttributeName(token.getTokenField());
+    string attributeName = token.getTokenField();
     if (getNextToken()!=EQUAL_TAG)
     {
-        //error
-        return false;
+        wrongTokenError(EnumStrings[EQUAL_TAG]);
     }
     if(getNextToken()!=QUOTED_TEXT)
     {
-        //error
-        return false;
+        wrongTokenError(EnumStrings[QUOTED_TEXT]);
     }
-    attr.setAttributeValue(token.getTokenField());
-    element->addAttribute(attr);
-    return true;
+    return new XMLAttribute(attributeName,token.getTokenField());
 }
 /**
  * Misc = DOCTYPE_TAG | COMMENT_TAG | PROCESS_INST ;
@@ -237,16 +238,15 @@ bool Parser::parseMiscelanus()
  *
  * @return
  */
-Attribute Parser::cdataToAttribute()
+XMLAttribute* Parser::cdataToAttribute()
 {
-    return Attribute("_cdata",token.getTokenField());
+    return new XMLAttribute("_cdata",token.getTokenField());
 }
 
-void Parser::wrongTokenException(string expected)
+void Parser::wrongTokenError(string expected)
 {
     throw WrongTokenTypeException(expected,token.getTokenTypeString(),token.getLine(),token.getColumn());
 }
-void Parser::stackException(string expected)
-{
+void Parser::stackError(string expected){
     throw NameStackException(expected,token.getTokenField(),token.getLine(),token.getColumn());
 }

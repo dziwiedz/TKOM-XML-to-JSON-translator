@@ -10,6 +10,6 @@ XMLTree::~XMLTree() {
 
 XMLTree::XMLTree() {}
 
-void XMLTree::writeToJS() {
-
-}
+//void XMLTree::writeToJS() {
+//
+//}

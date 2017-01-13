@@ -9,6 +9,7 @@
 #include "Lexer.h"
 #include "XMLTree.h"
 #include "ParserExceptions.h"
+#include "XMLElement.h"
 #include <stack>
 class Parser {
     Lexer& scn;
@@ -16,20 +17,21 @@ class Parser {
     Token backToken;
     stack<string> elementStack;
 
-    XMLNode* parseElement();
-    bool parseContent(XMLNode*);
-    bool parseOpenBody(XMLNode*);
-    bool parseCloseBody(XMLNode*);
-    bool parseAttributes(XMLNode*);
+    XMLElement* parseElement();
+    XMLElement* parseOpenBody();
+    bool parseContent(XMLElement*);
+    bool parseCloseBody(XMLElement*);
+    void parseAttributes(XMLElement*);
+    XMLAttribute* parseSingleAttribute();
     bool parseMiscelanus();
     Atoms getNextToken();
     Atoms getNextTokenWithSpaces();
     Atoms tokenType();
-    Attribute cdataToAttribute();
+    XMLAttribute* cdataToAttribute();
 
 //    Parse error functions
-    void wrongTokenException(string);
-    void stackException(string);
+    void wrongTokenError(string);
+    void stackError(string);
 
 
 public:
@@ -38,7 +40,7 @@ public:
     virtual ~Parser();
 
 
-    XMLNode* parse();
+    XMLElement* parse();
 
 
 

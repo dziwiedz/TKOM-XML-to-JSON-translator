@@ -10,7 +10,7 @@ int main() {
     Source s("/Users/Dzwiedz/ClionProjects/TKOM/test.xml");
     Lexer sc(s);
     Parser parser(sc);
-    XMLNode *rootElement;
+    XMLElement *rootElement;
     rootElement = parser.parse();
     if (rootElement==NULL)
     {
@@ -18,7 +18,7 @@ int main() {
         return 0;
     }
     cout << "Done\n";
-    rootElement->print();
+//    rootElement->print();
     vector<Token> vt;
   /*  do{
         vt.push_back(sc.nextToken(false));
