@@ -3,10 +3,22 @@
 //
 
 #include "XMLAttribute.h"
-#include <iostream>
+
+
+
 
 XMLAttribute::XMLAttribute(const string &name, const string &attributeValue) :
-        XMLNode(name),
-        attributeValue(attributeValue),
-        nodeType(AttributeNode)
-{}
+        name(name),
+        attributeValue(attributeValue) {}
+
+const string &XMLAttribute::getAttributeValue() const {
+    return attributeValue;
+}
+
+const string &XMLAttribute::getName() const {
+    return name;
+}
+
+JSPair* XMLAttribute::convertToJSPair() {
+    return new JSPair("@"+name,new JSValue(attributeValue));
+}

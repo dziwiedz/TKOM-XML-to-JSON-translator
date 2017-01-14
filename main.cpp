@@ -18,7 +18,9 @@ int main() {
         return 0;
     }
     cout << "Done\n";
-//    rootElement->print();
+    JSObject *jsonRoot = new JSObject();
+    jsonRoot->addNewPair(rootElement->convertToJs());
+    jsonRoot->print();
     vector<Token> vt;
   /*  do{
         vt.push_back(sc.nextToken(false));

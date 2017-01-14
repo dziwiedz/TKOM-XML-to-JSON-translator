@@ -3,29 +3,33 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Source.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLElement.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/XMLAttribute.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Source.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSObject.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ParserExceptions.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/XMLElement.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLNode.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Lexer.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSArray.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Lexer.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSNode.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LexerExceptions.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/JsonWriter.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/JsonWriter.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSNode.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/LexerExceptions.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSPair.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSObject.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/XMLElement.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/XMLAttribute.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLAttribute.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLTree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Token.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Atoms.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Lexer.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSValue.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Parser.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLNode.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/XMLTree.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSArray.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSPair.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Atoms.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Parser.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/JSValue.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/ParserExceptions.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

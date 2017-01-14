@@ -3,6 +3,7 @@
 //
 
 #include "Parser.h"
+#include "XMLAttribute.h"
 #include <iostream>
 
 Parser::Parser(Lexer &s) : scn(s) {}
@@ -71,7 +72,7 @@ XMLElement* Parser::parseElement() {
         case(END_TAG):
         {
             while(parseContent(element));
-            if (tokenType()==START_CLOSE_TAG && parseCloseBody(element)) return element;
+            if (tokenType()==START_CLOSE_TAG && parseCloseBody()) return element;
             else
             {
                 // error
@@ -82,7 +83,7 @@ XMLElement* Parser::parseElement() {
         }
         case(START_CLOSE_TAG):
         {
-            parseCloseBody(element);
+            parseCloseBody();
             return element;
         }
         default:
@@ -107,10 +108,10 @@ XMLElement* Parser::parseOpenBody()
     {
         wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
     }
-//    XMLNode *element = new XMLNode();
+//    XMLTextNode *element = new XMLTextNode();
     XMLElement* element = new XMLElement(token.getTokenField());
     elementStack.push(token.getTokenField());
-    parseAttributes(element);
+    element->setAttributesList(parseAttributes());
     return element;
 }
 /**
@@ -130,12 +131,12 @@ bool Parser::parseContent(XMLElement *element)
         }
         case(CDATA):
         {
-            element->addNewNode(cdataToAttribute());
+            element->addAttribute(cdataToAttribute());
             return true;
         }
         case(SIMPLE_TEXT):
         {
-            element->addNewNode(new XMLNode(token.getTokenField()));
+            element->addTextNode(token.getTokenField());
             return true;
         }
         case(START_TAG):
@@ -143,7 +144,7 @@ bool Parser::parseContent(XMLElement *element)
             XMLElement *child = parseElement();
             if(child!=NULL)
             {
-                element->addNewNode(child);
+                element->addChildElement(child);
                 return true;
             }
             else
@@ -160,7 +161,7 @@ bool Parser::parseContent(XMLElement *element)
  * @param element wskaznik na akutalny wezel
  * @return true - jezeli poprawnie wykonano parsowanie, false w przeciwnym wypadku
  */
-bool Parser::parseCloseBody(XMLElement *element)
+bool Parser::parseCloseBody()
 {
     if (tokenType()!=START_CLOSE_TAG)
     {
@@ -189,29 +190,26 @@ bool Parser::parseCloseBody(XMLElement *element)
  *
  * @return Vector of attributes. Could be empty if element dosen't have any
  */
-void Parser::parseAttributes(XMLElement* element) {
-    XMLAttribute* attribute;
-    while((attribute=parseSingleAttribute())!= nullptr) element->addNewNode(attribute);
+vector<XMLAttribute*> Parser::parseAttributes() {
+    vector<XMLAttribute*> attributes;
+    XMLAttribute* attr;
+    while((attr=parseSingleAttribute())!= nullptr) attributes.push_back(attr);
+    return attributes;
 }
 /**
  * Atributte = AttributeName, EQUAL_TAG, ATTRIBUTE_VALUE ;
  * @return Attribute
  */
-XMLAttribute* Parser::parseSingleAttribute()
-{
-    XMLAttribute* attr;
-    if(getNextToken()!=ATTRIBUTE_NAME)
-    {
+XMLAttribute* Parser::parseSingleAttribute() {
+    if (getNextToken() != ATTRIBUTE_NAME) {
 //        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
         return nullptr;
     }
     string attributeName = token.getTokenField();
-    if (getNextToken()!=EQUAL_TAG)
-    {
+    if (getNextToken() != EQUAL_TAG) {
         wrongTokenError(EnumStrings[EQUAL_TAG]);
     }
-    if(getNextToken()!=QUOTED_TEXT)
-    {
+    if (getNextToken() != QUOTED_TEXT) {
         wrongTokenError(EnumStrings[QUOTED_TEXT]);
     }
     return new XMLAttribute(attributeName,token.getTokenField());

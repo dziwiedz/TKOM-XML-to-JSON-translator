@@ -5,7 +5,7 @@
 #ifndef TKOM_ATTRIBUTE_H
 #define TKOM_ATTRIBUTE_H
 #include <string>
-#include "XMLNode.h"
+#include "JSPair.h"
 
 using namespace std;
 /**
@@ -13,13 +13,19 @@ using namespace std;
  * Name - nazwa atrybutu
  * AttributeValue - wartosc atrybutu
  */
-class XMLAttribute: public XMLNode {
-private:
-    string attributeValue;
-
+class XMLAttribute {
 public:
     XMLAttribute(const string &name, const string &attributeValue);
-    NodeType nodeType;
+
+    const string &getAttributeValue() const;
+
+    const string &getName() const;
+
+    JSPair* convertToJSPair();
+
+private:
+    string attributeValue;
+    string name;
 
 
 };
