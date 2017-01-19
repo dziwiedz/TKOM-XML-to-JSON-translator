@@ -12,19 +12,24 @@
  * Glowna klasa translatora
  * Udostepnia uslugi konwersji zadanego pliku XML na json, oraz testowanie poprawnosci translaotra
  */
-class Translator {
-public:
-    Translator();
+namespace Translator {
 
-    ~Translator();
+    extern const string XMLExtension;
+
+    extern const string JSONExtension;
 
     void translateFile(string pathFile);
+
     void testFolder(string directoryPath);
+
     void testFile(string pathFile);
 
-private:
+    string grepFileNameFromFilePath(string filePath);
 
-};
+    string grepDirectoryFromFilePath(string filePath);
 
+    string convertToJsonPath(string filePath);
+
+}
 
 #endif //TKOM_TRANSLATOR_H

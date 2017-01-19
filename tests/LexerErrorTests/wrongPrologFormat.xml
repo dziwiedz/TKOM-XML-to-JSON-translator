@@ -1,0 +1,29 @@
+<?xml prolog="2" ? >
+<!DOCTYPE root >
+<root>
+    <textnode>simpleText</textnode>
+    <emptyNdeWithArg arg="5"/>
+    <nodeWithArg arg="Argument" argument="arg"></nodeWithArg>
+    <nodeWithArgAndText arg="Argument" argument="arg">Attribute Information</nodeWithArgAndText>
+    <mixedContent>
+        first text
+        <element>Element</element>
+        second text
+        <element>Element drugi</element>
+        third text
+        <!-- Slowacki wielkim poeta byl -->
+    </mixedContent>
+    <moreMixedContent>
+        More Mixed Content!
+        <element name="element"></element>
+        This is perfect time to use entities like &amp; or &quot;
+        <node>Node text<nodeChild>That contains</nodeChild>child</node>
+        2 is &gt; than 1 but &lt; than 3
+        <node>Lonely node</node>
+        <![CDATA[return0]]>
+    </moreMixedContent>
+    <!DOCTYPE >
+    <lonelyNode/>
+    <attributeEntities amp="&amp;" quot="&quot;" apos ='&apos;' lt="&lt;" gt="&gt;"></attributeEntities>
+    <?Process Instrucion ?>
+</root>

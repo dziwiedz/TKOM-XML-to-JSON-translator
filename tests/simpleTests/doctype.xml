@@ -1,0 +1,5 @@
+<!DOCTYPE root>
+<root> Doctype Tet
+    <!DOCTYPE node>
+    <node>Node text</node>
+</root>

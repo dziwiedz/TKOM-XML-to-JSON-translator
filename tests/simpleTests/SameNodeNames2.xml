@@ -1,0 +1,6 @@
+<root> LiczbaElementow=“3”> Elementy o takiej samej nazwie wezla
+	<node>Adam</node>
+	<node>Anna</node>
+	<node>Milena</node>
+	Koniec
+</root>

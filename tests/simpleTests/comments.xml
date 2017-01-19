@@ -1,0 +1,9 @@
+<!-- First Comment -->
+
+<root>
+    <!-- second comment-->
+    Root text
+    <!-- third comment -->
+    <node name="Janusz"><!--fourth comment --></node>
+</root>
+<!-- FIfth comment-->

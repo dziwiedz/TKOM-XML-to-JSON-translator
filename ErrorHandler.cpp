@@ -2,6 +2,8 @@
 // Created by Łukasz Niedźwiedź on 19/01/17.
 //
 
+#include <cstdlib>
+#include <iostream>
 #include "ErrorHandler.h"
 
 ErrorHandler::ErrorHandler() : errorOccured(false)
@@ -16,11 +18,20 @@ bool ErrorHandler::isErrorOccured() const {
 }
 
 void ErrorHandler::setParserError(string message, unsigned int l, unsigned int c) {
-    errorMessage = "Patser error at line: " + to_string(l) +", column: "+to_string(c) +"\nError: "+ message;
-    errorOccured=true;
+    if (!errorOccured) {
+        errorMessage = "Parser error at line: " + to_string(l) + ", column: " + to_string(c) + "\nError: " + message + "\n";
+        errorOccured = true;
+    }
 }
 
 void ErrorHandler::setLexerError(string message, unsigned int l, unsigned int c) {
-    errorMessage = "Lexer error at line: " + to_string(l) +", column: "+to_string(c) +"\nError: "+ message;
-    errorOccured=true;
+    if (!errorOccured) {
+        errorMessage = "Lexer error at line: " + to_string(l) + ", column: " + to_string(c) + "\nMessage : " + message + "\n";
+        errorOccured = true;
+    }
+}
+
+void ErrorHandler::printErrorMessage() {
+    cout << "\033[31m" <<  errorMessage << "\033[49m";
+
 }

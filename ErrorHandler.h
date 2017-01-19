@@ -17,6 +17,8 @@ public:
 
     const string &getErrorMessage() const;
 
+    void printErrorMessage();
+
     bool isErrorOccured() const;
 
 private:

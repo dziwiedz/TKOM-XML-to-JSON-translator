@@ -242,9 +242,9 @@ XMLAttribute* Parser::cdataToAttribute()
 void Parser::wrongTokenError(string expected)
 {
     string errorMessage = "Expected token " + expected + ", but found "+ token.getTokenTypeString();
-    errorHandler->setLexerError(errorMessage,token.getLine(),token.getColumn());
+    errorHandler->setParserError(errorMessage,token.getLine(),token.getColumn());
 }
 void Parser::stackError(string expected){
     string errorMessage = "Expected token name: " + expected + ", but found: "+ token.getTokenField();
-    errorHandler->setLexerError(errorMessage,token.getLine(),token.getColumn());
+    errorHandler->setParserError(errorMessage,token.getLine(),token.getColumn());
 }

@@ -1,0 +1,14 @@
+<students>
+    <student>
+        <name>Jan Kowalski</name>
+        <score>5</score>
+    </student>
+    <student poprawa="Tak">
+        <name>Adam Nowak</name>
+        <score>3</score>
+    </student>
+    <student>
+        <name>Kamil Stoch</name>
+        <score>5</score>
+    </student>
+</students>
