@@ -22,6 +22,7 @@ struct TextPos
 
 class Source
 {
+private:
 
     FILE* inputFile;
     unsigned int column_number;
@@ -32,7 +33,11 @@ class Source
 public:
     Source(string fileName);
 
-    virtual ~Source();
+    Source();
+
+    ~Source();
+
+    void openFile(string filePath);
 
     char getNextChar();
 

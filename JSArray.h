@@ -17,11 +17,11 @@ public:
 
     void addNewElement(JSNode*);
 
+    void saveToFile(std::ofstream&);
+
     void print();
 private:
     vector<JSNode*> elements;
-
-
 };
 
 

@@ -23,3 +23,14 @@ void JSArray::print() {
 
 JSArray::JSArray() : JSNode(JSType::Array) {}
 
+void JSArray::saveToFile(std::ofstream& file) {
+    unsigned long size = elements.size();
+    file << "[";
+    for (unsigned long i = 0 ; i < size-1 ; ++i)
+    {
+        elements[i]->saveToFile(file);
+        file << ",\n";
+    }
+    elements[size-1]->saveToFile(file);
+    file << "]";
+}

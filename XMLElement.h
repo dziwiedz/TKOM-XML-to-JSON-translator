@@ -19,7 +19,6 @@ class XMLElement {
 public:
     XMLElement(const string &elementName);
 
-
     void setAttributesList(vector<XMLAttribute*>);
     void addAttribute(XMLAttribute*);
     bool hasAttributes();
@@ -32,14 +31,12 @@ public:
     void setTwin(XMLElement*);
     bool hasTwin();
 
-    bool hasText() const;
-
     bool isProcessed() const;
+    const string &getElementName() const;
 
     JSPair* convertToJs();
     JSNode* convertAsArrayElement();
 
-    const string &getElementName() const;
 
 private:
     vector<XMLElement*> childNodes;
@@ -48,13 +45,13 @@ private:
     XMLElement* twin;
     string elementName;
     bool processed;
+
+    /*Metody do przetwarzania na obiekty JSON*/
     JSArray* convertTwinsAsArray(XMLElement*);
     void processAttributesToJS(JSObject*);
     void processChildrens(JSObject*);
     JSPair* processTextNodes(bool defaultText);
     JSObject* processContent();
-
-
 };
 
 

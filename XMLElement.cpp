@@ -4,7 +4,7 @@
 
 #include "XMLElement.h"
 
-XMLElement::XMLElement(const string &elementName) : elementName(elementName) ,twin(NULL){}
+XMLElement::XMLElement(const string &elementName) : elementName(elementName) ,twin(NULL),processed(false){}
 
 void XMLElement::setAttributesList(vector<XMLAttribute*> list)
 {
@@ -24,7 +24,7 @@ void XMLElement::addChildElement(XMLElement* child){
     for (unsigned int i =0 ; i < childNodes.size() ; ++i) {
         if (childNodes[i]->getElementName() == child->getElementName()) {
             childNodes[i]->setTwin(child);
-            break;
+            return;
         }
     }
     childNodes.push_back(child);
@@ -42,8 +42,6 @@ void XMLElement::setTwin(XMLElement* e){
     else twin->setTwin(e);
 }
 bool XMLElement::hasTwin(){return twin!=NULL;}
-
-bool XMLElement::hasText() const{ return textNodes.size()>0;}
 
 bool XMLElement::isProcessed() const { return processed;}
 
@@ -137,7 +135,7 @@ JSArray* XMLElement::convertTwinsAsArray(XMLElement* element) {
     JSArray* array = new JSArray();
     XMLElement* currentNode = element;
     while(currentNode!=NULL) {
-        array->addNewElement(element->convertAsArrayElement());
+        array->addNewElement(currentNode->convertAsArrayElement());
         currentNode=currentNode->twin;
     }
     return array;

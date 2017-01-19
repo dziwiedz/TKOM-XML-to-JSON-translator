@@ -18,6 +18,8 @@ public:
     void addNewPair(JSPair*);
 
     void print();
+
+    void saveToFile(std::ofstream&);
 private:
     vector<JSPair*> members;
 

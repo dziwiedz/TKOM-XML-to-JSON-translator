@@ -15,3 +15,7 @@ JSType JSNode::getType() const {
 }
 
 void JSNode::print() {}
+
+void JSNode::saveToFile(std::ofstream&) {
+
+}

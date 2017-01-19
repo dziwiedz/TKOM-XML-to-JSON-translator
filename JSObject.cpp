@@ -22,3 +22,15 @@ void JSObject::print() {
 
 JSObject::JSObject() : JSNode(JSType::Node) {}
 
+void JSObject::saveToFile(std::ofstream& file) {
+    unsigned long size = members.size();
+    file << "{ ";
+    for (unsigned long i = 0 ; i < size -1 ; ++i)
+    {
+        members[i]->saveToFile(file);
+        file << ",\n";
+    }
+    members[size-1]->saveToFile(file);
+    file << "}\n";
+}
+

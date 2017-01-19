@@ -10,8 +10,7 @@ Lexer::~Lexer() {
 
 }
 
-Lexer::Lexer(Source &s) : src(s) {
-    scanErrors = 0;
+Lexer::Lexer(Source &s, ErrorHandler* handler) : src(s), errorHandler(handler) {
     nextc();
 }
 /**
@@ -25,8 +24,9 @@ void Lexer::nextc() {
  * Konczy dzialanie programu.
  * @param errorMessage
  */
-void Lexer::scanError(string errorMessage) {
-    throw LexerExceptions(src.getLine_number(),src.getColumn_number(),errorMessage);
+Token Lexer::scanError(string errorMessage) {
+    errorHandler->setLexerError(errorMessage,src.getLine_number(),src.getColumn_number());
+    return Token(END_OF_FILE,"",src.getLine_number(),src.getColumn_number());
 }
 
 /**
@@ -43,7 +43,7 @@ char Lexer::getNextChar() {
  * @return True if current char isn't whitespace
  */
 bool Lexer::isCorrectTextChar() {
-    return (isalpha(c) || isdigit(c) || (ispunct(c) && c!='<' && c!='=' && c!='>')); //Powinno byc bez c!='=' ..., zrobione tylko do testow
+    return (isalpha(c) || isdigit(c) || (ispunct(c) && c!='<')); //Powinno byc bez c!='=' ..., zrobione tylko do testow
 }
 /**
  * Check if current char is whitespace
@@ -77,7 +77,7 @@ Token Lexer::nextToken(bool keepSpaces) {
             //empty tag
         case '/': {
             nextc();
-            if (c != '>') scanError("Missing '>' after '/'");
+            if (c != '>') return scanError("Missing '>' after '/'");
             return Token(END_EMPTY_TAG, "/>", src.getLine_number(), src.getColumn_number());
         }
             //equal tag
@@ -87,30 +87,44 @@ Token Lexer::nextToken(bool keepSpaces) {
         }
             /*Atributtes can be opened by ' or " */
         case '\'': {
-            return processQuotedText();
+            if (keepSpaces) return processText(keepSpaces);
+            else return processQuotedText();
         }
-        case '"': {
-            return processQuotedText();
+        case '"': { /*Cytowany teskt nie moze zawierac spacji, a zwykly tekst moze zawierac spacje i moze rozpoczynac sie od "*/
+            if (keepSpaces) return processText(keepSpaces);
+            else return processQuotedText();
         }
         default: //Simple Text
         {
-            return processText(keepSpaces);
+            if (keepSpaces) return processText(keepSpaces);
+            else return processArgumentName();
+
         }
     }
 }
 
 Token Lexer::processText(bool keepSpaces) {
     string text = "";
+    char entity;
+    if (c=='"') text +='\\';
     text+=c;
-    while (getNextChar()!=EOF && (isCorrectTextChar() || (keepSpaces && isWhitespace())))
+    while (getNextChar()!=EOF  && (isCorrectTextChar() || (keepSpaces && isWhitespace())))
     {
-        if (c=='&') text+=processCharacterEntity();
-        else text+=c;
+        text+=processCharacter(true);
     }
-    //if (c==EOF) scanError("Unexpected end of file");
-    //nextc();
+    text = rtrim(text);
     if (keepSpaces) return Token(SIMPLE_TEXT, text, src.getLine_number(), src.getColumn_number());
     else return Token(ATTRIBUTE_NAME, text, src.getLine_number(), src.getColumn_number());
+}
+
+Token Lexer::processArgumentName() {
+    string text = "";
+    text+=c;
+    while (getNextChar()!=EOF && c!='=' && c!='>' && c!='/' && (isCorrectTextChar()  || (!isWhitespace())))
+    {
+        text+=processCharacter(true);
+    }
+    return Token(ATTRIBUTE_NAME, text, src.getLine_number(), src.getColumn_number());
 }
 
 /**
@@ -166,11 +180,8 @@ Token Lexer::processLeftLessSign()
 Token Lexer::processProlog() {
     string text = "";
     while (getNextChar()!=EOF && c!='?') text+=c;
-    if (c == EOF) scanError("Unexpected end of file.");
-    else {
-        if (getNextChar() != '>') scanError("Expected '>' after '?'.");
-
-    }
+    if (c == EOF) return scanError("Unexpected end of file.");
+    else if (getNextChar() != '>') return scanError("Expected '>' after '?'.");
     nextc();
     return Token(PROCESS_INST, text, src.getLine_number(), src.getColumn_number());
 
@@ -181,13 +192,13 @@ Token Lexer::processProlog() {
  * @return
  */
 Token Lexer::processComment() {
-    if (getNextChar() != '-') scanError("Expected double '-'");
+    if (getNextChar() != '-') return scanError("Expected double '-'");
     bool dashAppeared = false;
     while (getNextChar() != EOF && !(c=='-' && dashAppeared)) {
         dashAppeared = (c=='-');
     }
-    if (c == EOF) scanError("Unexpected end of file.");
-    else if (getNextChar() != '>') scanError("Expected '>' After '--'.");
+    if (c == EOF) return scanError("Unexpected end of file.");
+    else if (getNextChar() != '>') return scanError("Expected '>' After '--'.");
     nextc();
     return Token(COMMENT, "", src.getLine_number(), src.getColumn_number());
 }
@@ -199,17 +210,17 @@ Token Lexer::processComment() {
 Token Lexer::processCdata() {
 
     if (!checkCDATASpelling()) {
-        if (c == EOF) scanError("Unexpected end of file.");
-        else scanError("CDATA spelling error");
+        if (c == EOF) return scanError("Unexpected end of file.");
+        else return scanError("CDATA spelling error");
     }
     string value = "";
     bool squareBracketAppered = false;
     while (getNextChar()!=EOF && !(c==']' && squareBracketAppered)) {
         squareBracketAppered = (c==']');
-        value += c;
+        value +=processCharacter(false);
     }
-    if (c == EOF) scanError("Unexpected end of file.");
-    if ( getNextChar() != '>') scanError("Expected '>' After ']]'.");
+    if (c == EOF) return scanError("Unexpected end of file.");
+    if ( getNextChar() != '>') return scanError("Expected '>' After ']]'.");
     nextc();
     return Token(CDATA, value, src.getLine_number(), src.getColumn_number());
 }
@@ -234,12 +245,12 @@ bool Lexer::checkCDATASpelling() {
 Token Lexer::processDoctype() {
 
     if (!checkDoctypeSpelling()) {
-        if (c == EOF) scanError("Unexpected end of file.");
-        else scanError("DOCTYPE spelling error");
+        if (c == EOF) return scanError("Unexpected end of file.");
+        else return scanError("DOCTYPE spelling error");
     }
 
     while (c!=EOF && c!='>') nextc();
-    if (c!='>') scanError("Unexpected end of file.");
+    if (c!='>') return scanError("Unexpected end of file.");
     nextc();
     return Token(DOCTYPE, "", src.getLine_number(), src.getColumn_number());
 }
@@ -263,17 +274,18 @@ bool Lexer::checkDoctypeSpelling() {
  * @return
  */
 Token Lexer::processQuotedText() {
-    string s = "";
+    string text = "";
+    char entity;
     char endQuote = c;
     while (getNextChar() != EOF && !isWhitespace() && c != endQuote) {
-        if (c == '&') s+=processCharacterEntity();
-        else s += c;
+        text+=processCharacter(true);
+        if (c=='\0') return Token(END_OF_FILE,"",src.getLine_number(),src.getColumn_number());
     }
-    if (c == EOF) scanError("Unexpected end of file.");
-    if (isWhitespace()) scanError("Quoted text can't have whitespaces.");
-    if (c!=endQuote) scanError("Quoted text must be closed by the same quote ");
+    if (c == EOF) return scanError("Unexpected end of file.");
+    if (isWhitespace()) return scanError("Quoted text can't have whitespaces.");
+    if (c!=endQuote) return scanError("Quoted text must be closed by the same quote ");
     nextc();
-    return Token(QUOTED_TEXT, s, src.getLine_number(), src.getColumn_number());
+    return Token(QUOTED_TEXT, text, src.getLine_number(), src.getColumn_number());
 }
 
 /**
@@ -339,4 +351,22 @@ char Lexer::processCharacterEntity() {
             return '\0';
         }
     }
+}
+/**
+ * Przycinanie od prawej strony
+ * @param s
+ * @return
+ */
+inline std::string &Lexer::rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+    return s;
+}
+
+string Lexer::processCharacter(bool processEntity) {
+    string text;
+    if (c=='&' && processEntity) c=processCharacterEntity();
+    if (c=='"' || c=='\\') text+='\\';
+    text+=c;
+    return text;
 }

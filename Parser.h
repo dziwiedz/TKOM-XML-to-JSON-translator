@@ -7,15 +7,24 @@
 
 
 #include "Lexer.h"
-
-#include "ParserExceptions.h"
 #include "XMLElement.h"
 #include "XMLAttribute.h"
+#include "ErrorHandler.h"
 #include <stack>
 class Parser {
+public:
+    Parser(Lexer &s, ErrorHandler* handler);
+
+    virtual ~Parser();
+
+
+    XMLElement* parse();
+
+private:
     Lexer& scn;
     Token token;
     stack<string> elementStack;
+    ErrorHandler* errorHandler;
 
     XMLElement* parseElement();
     XMLElement* parseOpenBody();
@@ -32,15 +41,6 @@ class Parser {
 //    Parse error functions
     void wrongTokenError(string);
     void stackError(string);
-
-
-public:
-    Parser(Lexer &s);
-
-    virtual ~Parser();
-
-
-    XMLElement* parse();
 
 
 

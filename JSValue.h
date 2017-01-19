@@ -17,6 +17,7 @@ public:
 
     void print();
 
+    void saveToFile(std::ofstream&);
 
 private:
     string value;

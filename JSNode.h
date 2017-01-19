@@ -4,6 +4,8 @@
 
 #ifndef TKOM_JSOBJECT_H
 #define TKOM_JSOBJECT_H
+#include <iostream>
+#include <fstream>
 
 enum JSType {Node, Array, Value, Pair};
 /**
@@ -17,12 +19,12 @@ public:
 
     virtual void print();
 
+    virtual void saveToFile(std::ofstream&);
+
     JSType getType() const;
 
 private:
     JSType type;
-
-
 };
 
 

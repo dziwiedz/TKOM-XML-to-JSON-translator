@@ -12,6 +12,12 @@ void JSPair::print(){
     value->print();
 }
 
+void JSPair::saveToFile(std::ofstream &file) {
+    file << "\"" << name << "\" : ";
+    if (value->getType()!=JSType::Value) file << "\n";
+    value->saveToFile(file);
+}
+
 
 void JSPair::setName(const string &name) {
     JSPair::name = name;

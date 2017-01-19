@@ -6,7 +6,7 @@
 #include "XMLAttribute.h"
 #include <iostream>
 
-Parser::Parser(Lexer &s) : scn(s) {}
+Parser::Parser(Lexer &s, ErrorHandler* handler) : scn(s), errorHandler(handler) {}
 
 Parser::~Parser() {
 
@@ -17,7 +17,7 @@ Parser::~Parser() {
  */
 Atoms Parser::getNextToken() {
     token = scn.nextToken(false);
-    cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
+//    cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
     return token.getTokenType();
 }
 /**
@@ -26,7 +26,7 @@ Atoms Parser::getNextToken() {
  */
 Atoms Parser::getNextTokenWithSpaces() {
     token = scn.nextToken(true);
-    cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
+//    cout << EnumStrings[tokenType()] << " " << token.getTokenField() << endl;
     return token.getTokenType();
 }
 /**
@@ -61,11 +61,13 @@ XMLElement* Parser::parse() {
  */
 XMLElement* Parser::parseElement() {
     XMLElement* element;
-    element = parseOpenBody();
+    if ((element = parseOpenBody()) == nullptr) return nullptr;
     switch(tokenType())
     {
         case(END_EMPTY_TAG):
         {
+            elementStack.pop();
+            getNextToken();
             return element;
 
         }
@@ -75,10 +77,9 @@ XMLElement* Parser::parseElement() {
             if (tokenType()==START_CLOSE_TAG && parseCloseBody()) return element;
             else
             {
-                // error
+                if (!errorHandler->isErrorOccured()) wrongTokenError(EnumStrings[START_CLOSE_TAG]);
                 delete element;
-                throw ParserException();
-                return NULL;
+                return nullptr;
             }
         }
         case(START_CLOSE_TAG):
@@ -88,7 +89,6 @@ XMLElement* Parser::parseElement() {
         }
         default:
         {
-            throw ParserException();
             return NULL;
         }
     }
@@ -103,15 +103,17 @@ XMLElement* Parser::parseOpenBody()
     if (tokenType()!=START_TAG)
     {
         wrongTokenError(EnumStrings[START_TAG]);
+        return nullptr;
     }
     if (getNextToken()!=ATTRIBUTE_NAME)
     {
         wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
+        return nullptr;
     }
-//    XMLTextNode *element = new XMLTextNode();
     XMLElement* element = new XMLElement(token.getTokenField());
     elementStack.push(token.getTokenField());
     element->setAttributesList(parseAttributes());
+    if (errorHandler->isErrorOccured()) return nullptr;
     return element;
 }
 /**
@@ -147,11 +149,6 @@ bool Parser::parseContent(XMLElement *element)
                 element->addChildElement(child);
                 return true;
             }
-            else
-            {
-                throw ParserException();
-            }
-            return true;
         }
         default: return false;
     }
@@ -202,15 +199,16 @@ vector<XMLAttribute*> Parser::parseAttributes() {
  */
 XMLAttribute* Parser::parseSingleAttribute() {
     if (getNextToken() != ATTRIBUTE_NAME) {
-//        wrongTokenError(EnumStrings[ATTRIBUTE_NAME]);
         return nullptr;
     }
     string attributeName = token.getTokenField();
     if (getNextToken() != EQUAL_TAG) {
         wrongTokenError(EnumStrings[EQUAL_TAG]);
+        return nullptr;
     }
     if (getNextToken() != QUOTED_TEXT) {
         wrongTokenError(EnumStrings[QUOTED_TEXT]);
+        return nullptr;
     }
     return new XMLAttribute(attributeName,token.getTokenField());
 }
@@ -243,8 +241,10 @@ XMLAttribute* Parser::cdataToAttribute()
 
 void Parser::wrongTokenError(string expected)
 {
-    throw WrongTokenTypeException(expected,token.getTokenTypeString(),token.getLine(),token.getColumn());
+    string errorMessage = "Expected token " + expected + ", but found "+ token.getTokenTypeString();
+    errorHandler->setLexerError(errorMessage,token.getLine(),token.getColumn());
 }
 void Parser::stackError(string expected){
-    throw NameStackException(expected,token.getTokenField(),token.getLine(),token.getColumn());
+    string errorMessage = "Expected token name: " + expected + ", but found: "+ token.getTokenField();
+    errorHandler->setLexerError(errorMessage,token.getLine(),token.getColumn());
 }

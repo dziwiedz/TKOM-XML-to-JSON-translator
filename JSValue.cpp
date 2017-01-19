@@ -10,3 +10,7 @@ void JSValue::print() {
 }
 
 JSValue::JSValue(const string &value) : JSNode(JSType::Value), value(value) {}
+
+void JSValue::saveToFile(std::ofstream &file) {
+    file << "\"" << value << "\"";
+}

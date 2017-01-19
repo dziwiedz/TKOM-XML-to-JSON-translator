@@ -7,19 +7,7 @@
 
 Source::Source(string fileName)
 {
-    inputFile = fopen(fileName.c_str(),"r");
-
-    if (inputFile)
-    {
-        column_number = 0;
-        line_number = 1;
-
-    }
-    else
-    {
-        cout<< "Cannot read file " << fileName << endl;
-    }
-
+    openFile(fileName);
 }
 
 Source::~Source()
@@ -61,4 +49,22 @@ unsigned int Source::getColumn_number() const {
 
 unsigned int Source::getLine_number() const {
     return line_number;
+}
+
+void Source::openFile(string filePath) {
+    inputFile = fopen(filePath.c_str(),"r");
+    if (inputFile)
+    {
+        column_number = 0;
+        line_number = 1;
+    }
+    else
+    {
+        cout<< "Cannot read file " << filePath << endl;
+    }
+}
+
+Source::Source() {
+
+
 }

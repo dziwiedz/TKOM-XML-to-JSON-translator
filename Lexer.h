@@ -8,34 +8,35 @@
 
 #include "Source.h"
 #include "Token.h"
-#include "LexerExceptions.h"
+#include "ErrorHandler.h"
+
 /**
  * Skaner.
  */
 class Lexer
 {
 public:
-    Lexer(Source &s);
+    Lexer(Source &s, ErrorHandler* handler);
 
     virtual ~Lexer();
 
     Token nextToken(bool);
 
 private:
-
     Source& src;
-
     char c;
+    ErrorHandler* errorHandler;
 
-    unsigned int scanErrors;
 
     void nextc(); //ustawia wskaznik na nastepny znak
 
-    void scanError(string errorMessage); // wyswietlanie komunikatu o bledzie
+    Token scanError(string errorMessage); // wyswietlanie komunikatu o bledzie
 
     char getNextChar(); // ustawia wskaznik na nastepny znak i go zwraca
 
     char processCharacterEntity(); // rozpoznanie znakow specjalnych
+
+    string processCharacter(bool processEntity);
 
     bool checkCDATASpelling();
 
@@ -59,8 +60,9 @@ private:
 
     Token processText(bool);
 
-//    @TODO Dodac przycinania SimpleText od prawej strony
+    Token processArgumentName();
 
+    static inline std::string &rtrim(std::string &s);
 
 
 
