@@ -24,6 +24,14 @@ void ErrorHandler::setParserError(string message, unsigned int l, unsigned int c
     }
 }
 
+void ErrorHandler::setSourceError(string message) {
+    if (!errorOccured)
+    {
+        errorMessage = "Source error.\nCouldn't open file\nFile path: " + message + "\n";
+        errorOccured = true;
+    }
+}
+
 void ErrorHandler::setLexerError(string message, unsigned int l, unsigned int c) {
     if (!errorOccured) {
         errorMessage = "Lexer error at line: " + to_string(l) + ", column: " + to_string(c) + "\nMessage : " + message + "\n";

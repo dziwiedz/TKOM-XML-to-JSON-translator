@@ -1,9 +1,4 @@
 #include <iostream>
-#include <fstream>
-#include "Source.h"
-#include "Lexer.h"
-#include "Parser.h"
-#include "include/json/json.h"
 #include "Translator.h"
 
 void standardTests();
@@ -23,11 +18,11 @@ void interface()
     int choice;
     do {
         cout << "Translator XML - JSON\n";
-        cout << "1. Wykonaj standardowe testy.\n";
-        cout << "2. Prztestuj wszystkie pliki z danego foldera z rozszerzeniem xml.\n";
-        cout << "3. Przetestuj wybrany plik.\n";
-        cout << "4. Przetlumacz plik .json\n";
-        cout << "5. Wyjdz.\n";
+        cout << "1. Standard tests.\n";
+        cout << "2. Test all files in directory with xml extension\n";
+        cout << "3. Test file\n";
+        cout << "4. Translate file from XML to JSON.\n";
+        cout << "5. Exit\n";
         cout << "~>";
         cin >> choice;
         actionCheck(choice);
@@ -42,6 +37,7 @@ void actionCheck(int choice){
         }
         case(2):{
             folderTest();
+            break;
         }
         case(3):{
             fileTest();
@@ -49,6 +45,7 @@ void actionCheck(int choice){
         }
         case (4):{
             translateFile();
+            break;
         }
     }
 }

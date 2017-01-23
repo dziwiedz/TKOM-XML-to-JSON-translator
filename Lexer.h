@@ -62,6 +62,8 @@ private:
 
     Token processArgumentName();
 
+    Token processInstruction();
+
     static inline std::string &rtrim(std::string &s);
 
 

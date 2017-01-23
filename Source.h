@@ -5,6 +5,8 @@
 #ifndef TKOM_SOURCE_H
 #define TKOM_SOURCE_H
 #include <fstream>
+#include "ErrorHandler.h"
+
 using namespace std;
 
 /**
@@ -22,18 +24,10 @@ struct TextPos
 
 class Source
 {
-private:
-
-    FILE* inputFile;
-    unsigned int column_number;
-    unsigned int line_number;
-
-
-
 public:
-    Source(string fileName);
+    Source(string fileName, ErrorHandler*);
 
-    Source();
+    Source(ErrorHandler*);
 
     ~Source();
 
@@ -45,7 +39,11 @@ public:
 
     unsigned int getLine_number() const;
 
-
+private:
+    FILE* inputFile;
+    unsigned int column_number;
+    unsigned int line_number;
+    ErrorHandler* errorHandler;
 };
 
 

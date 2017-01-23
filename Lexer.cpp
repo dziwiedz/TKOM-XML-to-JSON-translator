@@ -105,7 +105,6 @@ Token Lexer::nextToken(bool keepSpaces) {
 
 Token Lexer::processText(bool keepSpaces) {
     string text = "";
-    char entity;
     if (c=='"') text +='\\';
     text+=c;
     while (getNextChar()!=EOF  && (isCorrectTextChar() || (keepSpaces && isWhitespace())))
@@ -161,7 +160,9 @@ Token Lexer::processLeftLessSign()
                 }
                 default: //<!Doctype ... >
                 {
-                    return processDoctype();
+                    nextc();
+                    if (c=='D') return processDoctype();
+                    else return processInstruction();
                 }
             }
         }
@@ -183,7 +184,7 @@ Token Lexer::processProlog() {
     if (c == EOF) return scanError("Unexpected end of file.");
     else if (getNextChar() != '>') return scanError("Expected '>' after '?'.");
     nextc();
-    return Token(PROCESS_INST, text, src.getLine_number(), src.getColumn_number());
+    return Token(PROLOG_INST, text, src.getLine_number(), src.getColumn_number());
 
 }
 /**
@@ -254,14 +255,33 @@ Token Lexer::processDoctype() {
     nextc();
     return Token(DOCTYPE, "", src.getLine_number(), src.getColumn_number());
 }
+/**
+ * Analiza tokenu typu Process Instruction <! .... >
+ * @return
+ */
+Token Lexer::processInstruction(){
+    unsigned int openTags = 0;
+    while (c!=EOF ){
+        if (c=='>'){
+            if (openTags ==0) break;
+            else openTags--;
+
+        }
+        if (c=='<') openTags++;
+        nextc();
+    }
+    if (c!='>') return scanError("Unexpected end of file.");
+    nextc();
+    return Token(PROCESS_INST,"",src.getLine_number(), src.getColumn_number());
+}
 
 /**
  * Check if DOCTYPE is properly formated
  * @return True if properly formated, false if not
  */
 bool Lexer::checkDoctypeSpelling() {
-    string doctype ="DOCTYPE";
-    for (int i =0; i <7 ; ++i)
+    string doctype ="OCTYPE";
+    for (int i =0; i <6 ; ++i)
     {
         if (c==EOF || c!=doctype[i]) return false;
         nextc();
@@ -275,7 +295,6 @@ bool Lexer::checkDoctypeSpelling() {
  */
 Token Lexer::processQuotedText() {
     string text = "";
-    char entity;
     char endQuote = c;
     while (getNextChar() != EOF && !isWhitespace() && c != endQuote) {
         text+=processCharacter(true);

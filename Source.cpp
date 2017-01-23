@@ -3,12 +3,13 @@
 //
 
 #include "Source.h"
-#include <iostream>
 
-Source::Source(string fileName)
+Source::Source(string fileName, ErrorHandler* handler) : errorHandler(handler)
 {
     openFile(fileName);
 }
+
+Source::Source(ErrorHandler *handler) : errorHandler(handler) {}
 
 Source::~Source()
 {
@@ -60,11 +61,6 @@ void Source::openFile(string filePath) {
     }
     else
     {
-        cout<< "Cannot read file " << filePath << endl;
+        errorHandler->setSourceError(filePath);
     }
-}
-
-Source::Source() {
-
-
 }

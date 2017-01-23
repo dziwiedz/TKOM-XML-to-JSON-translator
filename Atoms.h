@@ -9,7 +9,8 @@
 enum Atoms
 {
     COMMENT, // <!-- COMMENT -->
-    PROCESS_INST, // <?xml version="1.0" encoding="UTF-8"?>
+    PROLOG_INST, // <?xml version="1.0" encoding="UTF-8"?>
+    PROCESS_INST,
     SIMPLE_TEXT,
     ATTRIBUTE_NAME,
     CDATA, // <![CDATA[ ... ]]>
@@ -23,6 +24,7 @@ enum Atoms
     END_OF_FILE
 };
 static const char * EnumStrings[] = { "COMMENT",
+                                      "PROLOG_INST",
                                       "PROCESS_INST",
                                       "SIMPLE_TEXT",
                                       "ATTRIBUTE_NAME" ,

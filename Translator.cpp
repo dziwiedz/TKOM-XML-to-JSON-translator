@@ -4,8 +4,6 @@
 
 #include "Translator.h"
 #include <dirent.h>
-#include <iostream>
-#include <fstream>
 namespace Translator {
     const string JSONExtension = ".json";
 
@@ -13,25 +11,27 @@ namespace Translator {
 
     void translateFile(string filePath) {
         ErrorHandler errorHandler;
-        Source source(filePath);
-        Lexer lexer(source, &errorHandler);
-        Parser parser(lexer, &errorHandler);
-        XMLElement *xmlRoot;
-        xmlRoot = parser.parse();
-        cout << grepFileNameFromFilePath(filePath) << "\tPath: " << grepDirectoryFromFilePath(filePath) << endl;
-        ofstream file;
-        file.open(grepDirectoryFromFilePath(convertToJsonPath(filePath)), ios::out | ios::binary);
-        if (file.is_open()) {
-            if (errorHandler.isErrorOccured()) {
-                file << errorHandler.getErrorMessage();
-            } else {
-                JSObject *jsonRoot = new JSObject();
-                jsonRoot->addNewPair(xmlRoot->convertToJs());
-                jsonRoot->saveToFile(file);
+        Source source(filePath,&errorHandler);
+        if (!errorHandler.isErrorOccured()) {
+            Lexer lexer(source, &errorHandler);
+            Parser parser(lexer, &errorHandler);
+            XMLElement *xmlRoot;
+            xmlRoot = parser.parse();
+            ofstream file;
+            file.open(convertToJsonPath(filePath));
+            if (file.is_open()) {
+                if (errorHandler.isErrorOccured()) {
+                    file << errorHandler.getErrorMessage();
+                } else {
+                    JSObject *jsonRoot = new JSObject();
+                    jsonRoot->addNewPair(xmlRoot->convertToJs());
+                    jsonRoot->saveToFile(file);
+                }
+                file.close();
             }
-            file.close();
+            else cout << "Couldn't open file to save.\n";
         }
-
+        else errorHandler.printErrorMessage();
     }
 
     void testFolder(string directoryPath) {
@@ -56,31 +56,34 @@ namespace Translator {
         cout << "\033[34m" << " \nFile path: " << "\033[39m" << grepDirectoryFromFilePath(pathFile) << endl;
         cout << "\033[34m" << "File name: " << "\033[39m" << grepFileNameFromFilePath(pathFile)<< XMLExtension << endl;
         ErrorHandler errorHandler;
-        Source source(pathFile);
-        Lexer lexer(source, &errorHandler);
-        Parser parser(lexer, &errorHandler);
-        XMLElement *xmlRoot;
-        xmlRoot = parser.parse();
-        if (errorHandler.isErrorOccured()) errorHandler.printErrorMessage();
-        else {
-            JSObject *jsonRoot = new JSObject();
-            jsonRoot->addNewPair(xmlRoot->convertToJs());
-            ofstream file;
-            file.open("/Users/Dzwiedz/ClionProjects/TKOM/tests/test.json", ios::out | ios::binary);
-            if (file.is_open()) {
-                jsonRoot->saveToFile(file);
-                file.close();
-                std::ifstream jsonFile("/Users/Dzwiedz/ClionProjects/TKOM/tests/test.json", std::ifstream::binary);
-                Json::Value root;
-                Json::Reader reader;
-                bool parsingSuccessful = reader.parse(jsonFile, root, false);
-                if (!parsingSuccessful) cout << "Parsing error" << reader.getFormatedErrorMessages();
-                else {
-                    cout << "\033[32mParse Successful!\033[39m\n";
-                }
-                jsonFile.close();
-            } else { cout << "Couldn't create file.\n"; }
+        Source source(pathFile,&errorHandler);
+        if (!errorHandler.isErrorOccured()) {
+            Lexer lexer(source, &errorHandler);
+            Parser parser(lexer, &errorHandler);
+            XMLElement *xmlRoot;
+            xmlRoot = parser.parse();
+            if (errorHandler.isErrorOccured()) errorHandler.printErrorMessage();
+            else {
+                JSObject *jsonRoot = new JSObject();
+                jsonRoot->addNewPair(xmlRoot->convertToJs());
+                ofstream file;
+                file.open("/Users/Dzwiedz/ClionProjects/TKOM/tests/test.json", ios::out | ios::binary);
+                if (file.is_open()) {
+                    jsonRoot->saveToFile(file);
+                    file.close();
+                    std::ifstream jsonFile("/Users/Dzwiedz/ClionProjects/TKOM/tests/test.json", std::ifstream::binary);
+                    Json::Value root;
+                    Json::Reader reader;
+                    bool parsingSuccessful = reader.parse(jsonFile, root, false);
+                    if (!parsingSuccessful) cout << "Parsing error" << reader.getFormatedErrorMessages();
+                    else {
+                        cout << "\033[32mParse Successful!\033[39m\n";
+                    }
+                    jsonFile.close();
+                } else { cout << "Couldn't create file.\n"; }
+            }
         }
+        else errorHandler.printErrorMessage();
     }
 
     string grepFileNameFromFilePath(string filePath){
@@ -94,7 +97,8 @@ namespace Translator {
     }
 
     string convertToJsonPath(string filePath){
-        return grepDirectoryFromFilePath(filePath)+grepFileNameFromFilePath(filePath)+JSONExtension;
+        string jsonPath = grepDirectoryFromFilePath(filePath) +'/'+ grepFileNameFromFilePath(filePath) + JSONExtension;
+        return jsonPath;
     }
 
 }

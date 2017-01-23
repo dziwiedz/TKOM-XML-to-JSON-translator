@@ -3,8 +3,6 @@
 //
 
 #include "Parser.h"
-#include "XMLAttribute.h"
-#include <iostream>
 
 Parser::Parser(Lexer &s, ErrorHandler* handler) : scn(s), errorHandler(handler) {}
 
@@ -220,6 +218,8 @@ bool Parser::parseMiscelanus()
 {
     switch (getNextToken())
     {
+        case (PROLOG_INST):
+            return true;
         case(PROCESS_INST):
             return true;
         case(DOCTYPE):

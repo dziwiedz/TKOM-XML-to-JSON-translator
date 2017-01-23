@@ -13,6 +13,8 @@ public:
 
     void setLexerError(string message, unsigned int l, unsigned int c);
 
+    void setSourceError(string message);
+
     ErrorHandler();
 
     const string &getErrorMessage() const;
@@ -23,8 +25,6 @@ public:
 
 private:
     string errorMessage;
-    unsigned int line;
-    unsigned int column;
     bool errorOccured;
 
 };
